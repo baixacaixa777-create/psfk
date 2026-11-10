@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assinatura · Play Generator</title>
+<style>
+:root{--verde:#01875f;--verde-escuro:#016b4a;--txt:#202124;--cinza:#5f6368;--borda:#e8eaed;--bg:#f8f9fa;--amarelo:#f0d264;--amarelo-escuro:#7a5800}
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.topo{background:#fff;border-bottom:1px solid var(--borda)}
+.topo-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 20px}
+.logo{width:24px;height:24px}
+.topo b{font-size:17px}
+main{max-width:460px;width:100%;margin:0 auto;padding:40px 20px;flex:1}
+.card{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:32px 24px;box-shadow:0 1px 2px rgba(60,64,67,.08)}
+.cadeado{font-size:64px;text-align:center;margin-bottom:16px;opacity:.9}
+h2{font-size:20px;font-weight:600;margin:0 0 8px;text-align:center}
+p.sub{text-align:center;color:var(--cinza);font-size:14px;margin:0 0 24px;line-height:1.5}
+.dados{background:#fef7e0;border:1px solid #f0d264;border-radius:12px;padding:16px;margin-bottom:20px}
+.dados b{display:block;font-size:13px;color:var(--amarelo-escuro);margin-bottom:6px}
+.dados span{font-size:13.5px;color:var(--txt)}
+.btn-whatsapp{width:100%;background:#25d366;color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-whatsapp:hover{background:#1ebe5f}
+.btn-whatsapp svg{width:22px;height:22px}
+.voltar{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--cinza);text-decoration:none}
+.voltar:hover{color:var(--verde)}
+.rodape{text-align:center;font-size:12px;color:var(--cinza);padding:18px}
+</style>
+</head>
+<body>
+<header class="topo"><div class="topo-in">
+  <svg class="logo" viewBox="0 0 24 24"><path fill="#4285f4" d="M4.1 2.66c-.27.29-.42.73-.42 1.3v16.08c0 .57.15 1.01.42 1.3l.07.07L14.02 11.5v-.23L4.17 2.6l-.07.06z"/><path fill="#34a853" d="M17.32 14.82l-3.3-3.3v-.23l3.3-3.3.07.04 3.91 2.22c1.12.63 1.12 1.67 0 2.31l-3.91 2.22-.07.04z"/><path fill="#fbbc04" d="M17.39 14.78L14.02 11.4 4.1 21.34c.37.39.98.44 1.67.05l11.62-6.61"/><path fill="#ea4335" d="M17.39 8.02L5.77 1.41c-.69-.39-1.3-.34-1.67.05l9.92 9.94 3.37-3.38z"/></svg>
+  <b>Play Generator</b>
+</div></header>
+
+<main>
+  <div class="card">
+    <div class="cadeado">🔒</div>
+    <h2>Assinatura pendente</h2>
+    <p class="sub" id="msg">Sua assinatura ainda está sendo confirmada pelo administrador. Enquanto isso, o acesso à ferramenta fica bloqueado.</p>
+    <div class="dados">
+      <b id="lblEmail">E-mail: <span id="dadosEmail">—</span></b>
+      <span id="lblPlano">Plano: <span id="dadosPlano">—</span></span>
+    </div>
+    <button class="btn-whatsapp" id="btnZap">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.822 4.149c-.446-2.06-2.446-3.245-4.529-3.245h-5.58c-2.522 0-4.544 1.707-4.544 3.814v10.694c0 2.548 2.022 3.814 4.544 3.814h5.58c2.522 0 4.529-1.707 4.529-3.814V4.149zm-2.78 13.337c0 1.046-.985 1.739-2.034 1.739h-.577v-3.48h-.577v3.48h-.576v-5.238h.576v1.413h.577c.597 0 1.046-.418 1.046-1.046v-1.35c0-1.358-1.046-2.06-2.034-2.06h-.577V7.339h.577c1.046 0 2.034.702 2.034 2.034v4.311h-.577v3.48z"/></svg>
+      Quero garantir minha assinatura
+    </button>
+    <a class="voltar" href="/">Voltar para o login</a>
+  </div>
+</main>
+<div class="rodape">Play Generator · páginas whitelabel</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const planoMap = { quinzenal: 'Quinzenal', mensal: 'Mensal', trimestral: 'Trimestral' };
+
+(async () => {
+  const r = await fetch('/api/auth');
+  if (r.status === 401) { location.href = '/'; return; }
+  const j = await r.json();
+  const u = j.usuario;
+  if (!u) { location.href = '/'; return; }
+  $('#dadosEmail').textContent = u.email;
+  $('#dadosPlano').textContent = planoMap[u.plano] || u.plano;
+
+  const texto = encodeURIComponent(
+    'quero garantir minha assinatura do plano ' + (planoMap[u.plano] || u.plano) +
+    ' no meu numero +44 7348 503814'
+  );
+  $('#btnZap').onclick = () => {
+    location.href = 'https://wa.me/447348503814?text=' + texto;
+  };
+})();
+</script>
+</body>
+</html>

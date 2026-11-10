@@ -504,6 +504,7 @@ document.getElementById('formGerar').addEventListener('submit', async (e) => {
     if (r.status === 401) { location.href = '/'; return; }
     const j = await r.json();
     if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
+    if (j.usuario.assinatura_status !== 'ativa') { location.href = '/assinatura.html'; return; }
     document.getElementById('quem').textContent = j.usuario.nome + ' · ' + j.usuario.email +
       (j.usuario.admin ? ' · admin' : '');
     if (j.usuario.admin) {
