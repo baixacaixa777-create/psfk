@@ -15,9 +15,6 @@ body{margin:0;font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:va
 main{max-width:460px;width:100%;margin:0 auto;padding:40px 20px;flex:1}
 .card{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:32px 24px;box-shadow:0 1px 2px rgba(60,64,67,.08)}
 .lock{width:120px;height:120px;margin:0 auto 24px}
-.lock .arco{fill:none;stroke:#c4c7c5;stroke-width:10;stroke-linecap:round}
-.lock .corpo{fill:#c4c7c5}
-.lock .arco.ativo,.lock .corpo.ativo{fill:var(--verde-escuro);stroke:var(--verde-escuro)}
 h2{font-size:20px;font-weight:600;margin:0 0 8px;text-align:center}
 p.sub{text-align:center;color:var(--cinza);font-size:14px;margin:0 0 24px;line-height:1.5}
 .dados{background:#fef7e0;border:1px solid #f0d264;border-radius:12px;padding:16px;margin-bottom:24px}
@@ -39,11 +36,7 @@ p.sub{text-align:center;color:var(--cinza);font-size:14px;margin:0 0 24px;line-h
 
 <main>
   <div class="card">
-    <svg class="lock" viewBox="0 0 24 24">
-      <path class="arco" d="M12 13a5 5 0 0 0-5-5V5a2 2 0 0 1 4 0v3a5 5 0 0 0 5 5v3a2 2 0 0 1-4 0z"/>
-      <path class="corpo" d="M12 8a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-3a3 3 0 0 0-3-3z"/>
-      <path class="corpo" d="M12 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-    </svg>
+    <img class="lock" src="https://cdn-icons-png.flaticon.com/512/6815/6815095.png" alt="cadeado" />
     <h2>Assinatura pendente</h2>
     <p class="sub" id="msg">Sua assinatura ainda está sendo confirmada pelo administrador. Enquanto isso, o acesso à ferramenta fica bloqueado.</p>
     <div class="dados">
