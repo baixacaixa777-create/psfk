@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de páginas Play Store Clone</title>
+<style>
+*{-webkit-tap-highlight-color:transparent}body{margin:0;font-family:Roboto,Helvetica,Arial,sans-serif;background:#f5f5f5;color:#202124}.maxw{max-width:720px;margin:0 auto;padding:24px}h1{font-size:20px;margin:0 0 8px}form{background:#fff;padding:20px;border-radius:8px;border:1px solid #dadce0;box-shadow:0 1px 2px rgba(0,0,0,0.1)}.grupo{margin-bottom:16px}label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:#3c4043}input,textarea{width:100%;padding:10px;border:1px solid #dadce0;border-radius:4px;font-size:14px;box-sizing:border-box}input:focus,textarea:focus{outline:none;border-color:#1a73e8}textarea{min-height:120px;resize:vertical}.linha{display:flex;gap:12px;flex-wrap:wrap}.linha>div{flex:1}fieldset{border:none;padding:0;margin:0}legend{font-size:13px;font-weight:500;margin-bottom:10px;color:#3c4043}button.btn{background:#1a73e8;color:#fff;border:none;padding:12px 20px;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer}button.btn:hover{background:#1557b0}button.btn:disabled{opacity:0.6;cursor:not-allowed}#resultado{margin-top:20px;padding:16px;background:#e8f0fe;border:1px solid #b4d2ff;border-radius:4px;display:none}#resultado a{color:#1a73e8;font-weight:500;word-break:break-all}.erro{color:#d9302b;font-size:13px;margin-top:8px;display:none}small{color:#666;font-size:12px}
+</style>
+</head>
+<body>
+<div class="maxw">
+  <h1>Gerador de páginas (mostruário whitelabel)</h1>
+  <p style="color:#5f6368;font-size:14px">Preencha os dados, anexe ícone e capturas, e gere uma página com link exclusivo.</p>
+
+  <form id="formGerar">
+    <div class="grupo">
+      <label>Título do app</label>
+      <input type="text" name="titulo" placeholder="Ex: Subway Surfers City" required>
+    </div>
+    <div class="grupo">
+      <label>Nome da empresa / desenvolvedora</label>
+      <input type="text" name="empresa" placeholder="Ex: SYBO Games" required>
+    </div>
+    <div class="grupo">
+      <label>ID da desenvolvedora (dev id)</label>
+      <input type="text" name="dev_id" placeholder="Ex: 7363891306616760846" required>
+    </div>
+    <div class="linha">
+      <div class="grupo" style="flex:1">
+        <label>Avaliação (ex: 4,6)</label>
+        <input type="text" name="nota" placeholder="4,6" required>
+      </div>
+      <div class="grupo" style="flex:1">
+        <label>Número de avaliações</label>
+        <input type="text" name="num_avaliacoes" placeholder="338 mil avaliações" required>
+      </div>
+    </div>
+    <div class="linha">
+      <div class="grupo" style="flex:1">
+        <label>Classificação indicativa</label>
+        <input type="text" name="classificacao" placeholder="Classificação 18 anos" required>
+      </div>
+      <div class="grupo" style="flex:1">
+        <label>Downloads</label>
+        <input type="text" name="downloads" placeholder="10 mi+" required>
+      </div>
+    </div>
+    <div class="grupo">
+      <label>Atualizado em</label>
+      <input type="text" name="atualizado_em" placeholder="2 de nov. de 2026" required>
+    </div>
+    <div class="grupo">
+      <label>Disponível em</label>
+      <input type="text" name="disponivel_em" placeholder="Android, Windows" required>
+    </div>
+    <div class="grupo">
+      <label>Descrição curta (meta / resumo)</label>
+      <input type="text" name="descricao_curta" placeholder="Corra, salte, desvie e explore seu jogo!">
+    </div>
+    <div class="grupo">
+      <label>Descrição (Sobre este jogo)</label>
+      <textarea name="descricao" required>Corra, salte, desvie e explore seu jogo! Principais recursos...</textarea>
+    </div>
+
+    <fieldset>
+      <legend>Ícone do app (PNG, mesmo tamanho do original)</legend>
+      <div class="grupo" style="margin-bottom:8px">
+        <input type="file" name="icone" accept="image/*" required>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Capturas de tela (até 20 imagens)</legend>
+      <div class="grupo" style="margin-bottom:8px">
+        <input type="file" name="screenshots" accept="image/*" multiple>
+        <small>Selecione várias imagens</small>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn" id="btnEnviar">Gerar página</button>
+    <div class="erro" id="msgErro"></div>
+  </form>
+
+  <div id="resultado">
+    <strong>Página gerada com sucesso!</strong><br>
+    <a id="linkGerado" href="#" target="_blank"></a>
+  </div>
+
+  <div style="margin-top:24px;font-size:13px;color:#5f6368">
+    <strong>Links úteis:</strong><br>
+    • <a href="/api/campanhas" target="_blank">Listar campanhas geradas (JSON)</a><br>
+    • As páginas ficam disponíveis em <code>/&lt;token&gt;</code>
+  </div>
+</div>
+
+<script>
+async function subirArquivo(file) {
+  const r = await fetch('/api/upload-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome: file.name, tipo: file.type })
+  });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.erro || 'Falha ao preparar envio');
+  const up = await fetch(j.uploadUrl, {
+    method: 'PUT',
+    headers: { 'x-upsert': 'false' },
+    body: file
+  });
+  if (!up.ok) throw new Error('Falha ao enviar ' + file.name);
+  return j.publicUrl;
+}
+
+document.getElementById('formGerar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btnEnviar');
+  const erro = document.getElementById('msgErro');
+  const res = document.getElementById('resultado');
+  const link = document.getElementById('linkGerado');
+  erro.style.display = 'none';
+  res.style.display = 'none';
+  btn.disabled = true;
+
+  try {
+    const dados = new FormData(form);
+    const iconeInput = form.querySelector('input[name="icone"]');
+    const scInput = form.querySelector('input[name="screenshots"]');
+
+    btn.textContent = 'Enviando ícone...';
+    const icone_url = await subirArquivo(iconeInput.files[0]);
+
+    const screenshots = [];
+    const total = scInput.files.length;
+    for (let i = 0; i < total; i++) {
+      btn.textContent = 'Enviando captura ' + (i + 1) + '/' + total + '...';
+      screenshots.push(await subirArquivo(scInput.files[i]));
+    }
+
+    btn.textContent = 'Gerando página...';
+    const payload = {
+      titulo: dados.get('titulo'),
+      empresa: dados.get('empresa'),
+      dev_id: dados.get('dev_id'),
+      nota: dados.get('nota'),
+      num_avaliacoes: dados.get('num_avaliacoes'),
+      classificacao: dados.get('classificacao'),
+      downloads: dados.get('downloads'),
+      atualizado_em: dados.get('atualizado_em'),
+      disponivel_em: dados.get('disponivel_em'),
+      descricao_curta: dados.get('descricao_curta') || '',
+      descricao: dados.get('descricao'),
+      icone_url,
+      screenshots
+    };
+    const r = await fetch('/api/gerar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Erro ao gerar');
+
+    res.style.display = 'block';
+    link.href = j.url;
+    link.textContent = location.origin + j.url;
+  } catch (err) {
+    erro.textContent = err.message;
+    erro.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Gerar página';
+  }
+});
+</script>
+</body>
+</html>

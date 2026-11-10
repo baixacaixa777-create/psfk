@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    {
+      "source": "/:token([a-f0-9]{48})",
+      "destination": "https://wpnniwakdyuzybawohlp.supabase.co/storage/v1/object/public/pages/:token.html"
+    }
+  ],
+  "functions": {
+    "api/**": {
+      "includeFiles": "views/**"
+    }
+  }
+}
