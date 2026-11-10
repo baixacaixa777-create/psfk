@@ -72,6 +72,7 @@ test('Cadastro: sem 2FA a sessão fica pendente; com código libera', async () =
     const j = await r.json();
     assert.equal(j.ok, true);
     assert.equal(j.admin, false);
+    assert.match(j.twofa.secret, /^[A-Z2-7]{32}$/, 'secret base32 canônico (Google Authenticator aceita)');
     const cookie = r.headers.get('set-cookie').match(/sessao=([a-f0-9]+)/)[1];
     // sessão pendente não acessa o gerador
     const gerarPendente = await realFetch(base + '/api/gerar', {

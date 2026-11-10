@@ -124,23 +124,16 @@ function mostrar2fa(dados) {
 // QR via CDN; sem internet no carregamento, fica a chave manual (sempre visível)
 function desenharQr(uri) {
   const caixa = $('#qr2fa');
+  const img = document.createElement('img');
+  img.alt = 'QR code do 2FA';
+  img.width = 180; img.height = 180;
+  img.style.borderRadius = '8px';
+  img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=4&data=' + encodeURIComponent(uri);
+  img.onerror = () => {
+    caixa.innerHTML = '<span style="color:var(--cinza);font-size:12px">Não foi possível carregar o QR — digite a chave manual abaixo</span>';
+  };
   caixa.innerHTML = '';
-  const carregar = new Promise((ok, falha) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
-    s.onload = ok; s.onerror = falha;
-    document.head.appendChild(s);
-    setTimeout(falha, 6000);
-  });
-  carregar.then(() => {
-    const canvas = document.createElement('canvas');
-    caixa.appendChild(canvas);
-    window.QRCode.toCanvas(canvas, uri, { width: 180, margin: 1 }, (err) => {
-      if (err) caixa.innerHTML = '<span class="vazio" style="color:var(--cinza);font-size:12px">Use a chave manual abaixo</span>';
-    });
-  }).catch(() => {
-    caixa.innerHTML = '<span style="color:var(--cinza);font-size:12px">Não foi possível gerar o QR — use a chave manual abaixo</span>';
-  });
+  caixa.appendChild(img);
 }
 
 $('#formEntrar').addEventListener('submit', async (e) => {
