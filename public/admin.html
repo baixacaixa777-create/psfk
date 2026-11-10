@@ -99,7 +99,7 @@ let id2faVivo = null;
 let timer2fa = null;
 
 (async () => {
-  const r = await fetch('/api/auth/eu');
+  const r = await fetch('/api/auth');
   if (!r.ok) { location.href = '/'; return; }
   const j = await r.json();
   if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
