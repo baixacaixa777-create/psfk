@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerador de páginas · Play Store Clone</title>
+<style>
+:root{--verde:#01875f;--verde-escuro:#016b4a;--txt:#202124;--cinza:#5f6368;--borda:#e8eaed;--bg:#f8f9fa;--azul:#1a73e8}
+*{-webkit-tap-highlight-color:transparent;box-sizing:border-box}
+body{margin:0;font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--txt)}
+/* cabeçalho estilo Play Store */
+.topo{background:#fff;border-bottom:1px solid var(--borda);position:sticky;top:0;z-index:10}
+.topo-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:12px 20px}
+.logo{width:26px;height:26px;flex:none}
+.topo h1{font-size:19px;font-weight:500;margin:0;letter-spacing:-.2px}
+.topo h1 b{font-weight:700}
+.topo .direita{margin-left:auto;font-size:12px;color:var(--cinza);background:#f1f3f4;border-radius:999px;padding:6px 12px;white-space:nowrap}
+main{max-width:760px;margin:0 auto;padding:20px 20px 64px}
+.sub{color:var(--cinza);font-size:13.5px;margin:2px 0 20px;line-height:1.5}
+/* cards estilo Play */
+.card{background:#fff;border:1px solid var(--borda);border-radius:16px;margin-bottom:14px;overflow:hidden;box-shadow:0 1px 2px rgba(60,64,67,.08)}
+.card-cab{display:flex;align-items:center;gap:12px;padding:15px 18px;border-bottom:1px solid var(--borda)}
+.card-cab h2{font-size:15px;font-weight:500;margin:0;flex:1}
+.card-cab .ico{width:20px;height:20px;color:var(--verde);flex:none}
+.card-corpo{padding:16px 18px 18px;display:grid;gap:14px}
+.card-corpo.linha2{grid-template-columns:1fr 1fr}
+.card.off .card-corpo{display:none}
+/* switch Material */
+.sw{position:relative;width:40px;height:22px;flex:none}
+.sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.sw .trilho{position:absolute;inset:0;border-radius:999px;background:#c4c7c5;transition:background .2s}
+.sw .pino{position:absolute;top:4px;left:4px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .2s,background .2s}
+.sw input:checked ~ .trilho{background:var(--verde)}
+.sw input:checked ~ .trilho .pino{transform:translateX(18px);background:#fff}
+.sw input:checked + .pino{transform:translateX(18px)}
+/* campos */
+label{display:block;font-size:12.5px;font-weight:500;color:var(--cinza);margin-bottom:6px}
+input[type=text],input[type=number],input[type=url],textarea,select{width:100%;padding:10px 12px;border:1px solid var(--borda);border-radius:8px;font-size:14px;font-family:inherit;color:var(--txt);background:#fff;outline:none;transition:border .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--verde);box-shadow:0 0 0 3px rgba(1,135,95,.12)}
+textarea{min-height:110px;resize:vertical}
+fieldset{border:none;margin:0;padding:0;min-width:0}
+legend{font-size:12.5px;font-weight:500;color:var(--cinza);margin-bottom:10px}
+/* upload */
+.zona{border:1.5px dashed #cfd4d9;border-radius:12px;padding:14px;text-align:center;background:#fafafa;cursor:pointer;transition:background .15s,border-color .15s}
+.zona:hover{background:#f0f7f4;border-color:var(--verde)}
+.zona input{display:none}
+.zona .txt{font-size:13px;color:var(--cinza)}
+.zona .txt b{color:var(--verde);font-weight:500}
+/* comentários */
+.comentario{border:1px solid var(--borda);border-radius:12px;padding:14px;display:grid;gap:12px;background:#fff;position:relative}
+.comentario .cab{display:flex;align-items:center;justify-content:space-between}
+.comentario .cab span{font-size:12.5px;font-weight:500;color:var(--verde);background:#e6f4ee;border-radius:999px;padding:4px 10px}
+.remover-c{background:none;border:none;color:#c5221f;font-size:13px;font-weight:500;cursor:pointer;padding:4px 8px;border-radius:8px}
+.remover-c:hover{background:#fce8e6}
+/* botões */
+.btn{background:var(--verde);color:#fff;border:none;padding:13px 26px;border-radius:999px;font-size:14.5px;font-weight:500;font-family:inherit;cursor:pointer;transition:background .15s,transform .05s}
+.btn:hover{background:var(--verde-escuro)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+.btn-sec{background:#fff;color:var(--verde);border:1px solid var(--borda);padding:10px 20px;border-radius:999px;font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;width:100%}
+.btn-sec:hover{background:#e6f4ee}
+/* resultado */
+#resultado{margin-top:18px;padding:18px;background:#e6f4ee;border:1px solid #b3dfd0;border-radius:14px;display:none}
+#resultado strong{font-size:14.5px;color:var(--verde-escuro)}
+#resultado a{color:var(--verde);font-weight:500;word-break:break-all}
+.erro{color:#c5221f;font-size:13px;margin-top:10px;display:none}
+small{color:#80868b;font-size:12px}
+/* anexos visuais */
+.anexos{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.anexo{display:flex;align-items:center;gap:10px;border:1px solid var(--borda);border-radius:10px;padding:8px 10px;background:#fff;max-width:100%}
+.anexo img,.anexo .apk-ico{width:44px;height:44px;border-radius:8px;object-fit:cover;flex:none;background:#f1f3f4;display:flex;align-items:center;justify-content:center}
+.anexo .apk-ico{color:var(--verde)}
+.anexo .info{min-width:0;max-width:180px}
+.anexo .info b{display:block;font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.anexo .info small{font-size:11px}
+.anexo .remover-anexo{background:none;border:none;color:#c5221f;cursor:pointer;font-size:16px;line-height:1;padding:4px;border-radius:50%}
+.anexo .remover-anexo:hover{background:#fce8e6}
+.links{margin-top:22px;font-size:13px;color:var(--cinza)}
+.links a{color:var(--verde);font-weight:500;text-decoration:none}
+</style>
+</head>
+<body>
+<header class="topo">
+  <div class="topo-in">
+    <style>
+      .barra-sessao{margin-left:auto;display:flex;align-items:center;gap:10px}
+      .barra-sessao .quem{font-size:12.5px;color:var(--cinza);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .btn-mini{background:#fff;border:1px solid var(--borda);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--txt);font-family:inherit}
+      .btn-mini:hover{background:#f1f3f4}
+      .painel-apps{background:#fff;border:1px solid var(--borda);border-radius:16px;margin-bottom:14px;padding:0 18px 16px}
+      .painel-apps h2{font-size:15px;font-weight:500;margin:15px 0 10px;display:flex;align-items:center;gap:8px}
+      .painel-apps h2 svg{width:18px;height:18px;color:var(--verde)}
+      .app-linha{display:flex;align-items:center;gap:10px;border:1px solid var(--borda);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+      .app-linha b{font-size:13.5px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .app-linha .prazo{font-size:11.5px;color:var(--cinza);white-space:nowrap}
+      .app-linha .prazo.expirado{color:#c5221f;font-weight:500}
+      .app-linha .btn-mini{flex:none}
+      .vazio{font-size:13px;color:var(--cinza)}
+    </style>
+    <div class="barra-sessao"><span class="quem" id="quem"></span><button class="btn-mini" id="btnSair">Sair</button></div>
+    <svg class="logo" viewBox="0 0 24 24"><path fill="#4285f4" d="M4.1 2.66c-.27.29-.42.73-.42 1.3v16.08c0 .57.15 1.01.42 1.3l.07.07L14.02 11.5v-.23L4.17 2.6l-.07.06z"/><path fill="#34a853" d="M17.32 14.82l-3.3-3.3v-.23l3.3-3.3.07.04 3.91 2.22c1.12.63 1.12 1.67 0 2.31l-3.91 2.22-.07.04z"/><path fill="#fbbc04" d="M17.39 14.78L14.02 11.4 4.1 21.34c.37.39.98.44 1.67.05l11.62-6.61"/><path fill="#ea4335" d="M17.39 8.02L5.77 1.41c-.69-.39-1.3-.34-1.67.05l9.92 9.94 3.37-3.38z"/></svg>
+    <h1><b>Play</b> Generator</h1>
+    <span class="direita">Painel do gerador</span>
+  </div>
+</header>
+
+<main>
+  <div class="painel-apps">
+    <h2><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>Meus apps <span id="contadorApps" style="font-weight:400;font-size:12.5px;color:var(--cinza)"></span></h2>
+    <div id="avisoVencimento" style="display:none;background:#fef7e0;border:1px solid #f0d264;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:#7a5800"></div>
+    <div id="listaMeusApps"><span class="vazio">Carregando...</span></div>
+  </div>
+  <p class="sub">Monte a página, escolha o que aparece com os interruptores e gere o link pronto para compartilhar. Seções desligadas ficam de fora da página.</p>
+
+  <form id="formGerar">
+    <div class="card">
+      <div class="card-cab">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l-5.5 9h11z"/><circle cx="12" cy="16" r="4"/></svg>
+        <h2>Informações do app</h2>
+      </div>
+      <div class="card-corpo">
+        <div><label>Título do app</label><input type="text" name="titulo" placeholder="Ex: Subway Surfers City" required></div>
+        <div class="linha2" style="display:grid;gap:14px">
+          <div><label>Empresa / desenvolvedora</label><input type="text" name="empresa" placeholder="Ex: SYBO Games" required></div>
+          <div><label>ID da desenvolvedora</label>
+            <div style="display:flex;gap:8px">
+              <input type="text" name="dev_id" id="devId" placeholder="Ex: 7363891306616760846" required style="flex:1">
+              <button type="button" id="btnRandomDev" title="Gerar ID aleatório" style="flex:none;display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--borda);border-radius:8px;padding:0 14px;cursor:pointer;color:var(--verde);font-family:inherit;font-size:13px;font-weight:500" onmouseover="this.style.background='#e6f4ee'" onmouseout="this.style.background='#fff'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.6 13.5l-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3-2.3-2.3L8.8 9l2.3 2.3L13.4 9l1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.5z"/></svg>
+                Random
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="linha2" style="display:grid;gap:14px">
+          <div><label>Ícone do app (PNG)</label>
+            <label class="zona"><input type="file" name="icone" accept="image/*" required><span class="txt"><b>Toque para escolher</b> · PNG, JPG, WEBP ou GIF</span></label>
+            <div class="anexos" data-anexos="icone"></div>
+          </div>
+          <div><label>Capturas de tela (até 20)</label>
+            <label class="zona"><input type="file" name="screenshots" accept="image/*" multiple><span class="txt"><b>Toque para escolher</b> · várias imagens</span></label>
+            <div class="anexos" data-anexos="screenshots"></div>
+          </div>
+          <div><label>Arquivo APK — opcional (o botão "Instalar Agora" da página baixa o APK automaticamente)</label>
+            <label class="zona"><input type="file" name="apk" accept=".apk"><span class="txt"><b>Toque para escolher</b> · arquivo .apk</span></label>
+            <div class="anexos" data-anexos="apk"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card-nota">
+      <div class="card-cab">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <h2>Nota e avaliações</h2>
+        <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_nota" checked><span class="trilho"><span class="pino"></span></span></label>
+      </div>
+      <div class="card-corpo linha2">
+        <div><label>Avaliação (1,0 a 5,0 — use as setas ou a roda do mouse)</label><input type="number" name="nota" min="1" max="5" step="0.1" value="4.6" required></div>
+        <div><label>Número de avaliações</label>
+          <div style="display:flex;gap:8px">
+            <input type="number" name="num_avaliacoes_num" min="1" max="9999" step="1" value="218" required style="flex:1">
+            <select name="num_avaliacoes_uni" style="flex:none;width:86px">
+              <option value="mil" selected>mil</option>
+              <option value="mi">mi</option>
+              <option value="bi">bi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card-detalhes">
+      <div class="card-cab">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <h2>Detalhes</h2>
+        <span style="font-size:11px;color:var(--cinza);margin-right:4px">exibir</span>
+      </div>
+      <div class="card-corpo">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1"><label>Classificação indicativa</label><select name="classificacao" required title="Muda o selo na página gerada">
+            <option value="Livre">Livre</option>
+            <option value="10">10 anos</option>
+            <option value="12">12 anos</option>
+            <option value="14">14 anos</option>
+            <option value="16" selected>16 anos</option>
+            <option value="18">18 anos</option>
+          </select></div>
+          <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_classificacao" checked><span class="trilho"><span class="pino"></span></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1"><label>Downloads</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" name="downloads_num" min="1" max="9999" step="1" value="10" required style="flex:1">
+              <select name="downloads_uni" style="flex:none;width:86px">
+                <option value="mil">mil</option>
+                <option value="mi" selected>mi</option>
+                <option value="bi">bi</option>
+              </select>
+            </div>
+          </div>
+          <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_downloads" checked><span class="trilho"><span class="pino"></span></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1"><label>Atualizado em</label><input type="text" name="atualizado_em" placeholder="2 de nov. de 2026" required></div>
+          <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_atualizado" checked><span class="trilho"><span class="pino"></span></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="flex:1"><label>Disponível em</label><input type="text" name="disponivel_em" placeholder="Android, Windows" required></div>
+          <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_disponivel" checked><span class="trilho"><span class="pino"></span></span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card-descricao">
+      <div class="card-cab">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        <h2>Descrição</h2>
+        <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_descricao" checked><span class="trilho"><span class="pino"></span></span></label>
+      </div>
+      <div class="card-corpo">
+        <div><label>Descrição curta (meta)</label><input type="text" name="descricao_curta" placeholder="Corra, salte, desvie e explore seu jogo!"></div>
+        <div><label>Descrição (Sobre este jogo)</label><textarea name="descricao" required>Corra, salte, desvie e explore seu jogo! Principais recursos...</textarea></div>
+      </div>
+    </div>
+
+    <div class="card" id="card-screenshots">
+      <div class="card-cab">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        <h2>Capturas de tela</h2>
+        <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_screenshots" checked><span class="trilho"><span class="pino"></span></span></label>
+      </div>
+      <div class="card-corpo"><small>As capturas anexadas acima aparecem no carrossel. Desligue para ocultar o carrossel inteiro na página.</small></div>
+    </div>
+
+    <fieldset id="comentarios">
+      <div class="card" id="card-comentarios">
+        <div class="card-cab">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+          <h2>Comentários</h2>
+          <label class="sw" title="Exibir na página"><input type="checkbox" name="exibir_comentarios" checked><span class="trilho"><span class="pino"></span></span></label>
+        </div>
+        <div class="card-corpo">
+          <div id="listaComentarios" style="display:grid;gap:12px"></div>
+          <button type="button" class="btn-sec" id="btnAddComentario">+ Adicionar comentário</button>
+        </div>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn" id="btnEnviar" style="width:100%">Gerar página</button>
+    <div class="erro" id="msgErro"></div>
+  </form>
+
+  <div id="resultado">
+    <strong>Página gerada com sucesso!</strong><br>
+    <a id="linkGerado" href="#" target="_blank"></a>
+  </div>
+
+  <div class="links">
+    • <a href="/api/campanhas" target="_blank">Listar campanhas geradas (JSON)</a><br>
+    • As páginas ficam disponíveis em <code>/&lt;token&gt;</code>
+  </div>
+</main>
+
+<script>
+// botão Random do ID da desenvolvedora: gera e preenche automaticamente
+function idDevAleatorio() {
+  let n = String(1 + Math.floor(Math.random() * 9));
+  for (let i = 0; i < 18; i++) n += Math.floor(Math.random() * 10);
+  return n;
+}
+document.getElementById('btnRandomDev').addEventListener('click', () => {
+  document.getElementById('devId').value = idDevAleatorio();
+});
+// pré-preenchimento automático ao carregar
+if (!document.getElementById('devId').value) {
+  document.getElementById('devId').value = idDevAleatorio();
+}
+
+// anexos visuais: mostrar miniatura/nome/tamanho dos arquivos escolhidos
+function tamanhoLegivel(bytes) {
+  if (bytes >= 1048576) return (bytes / 1048576).toFixed(1).replace('.', ',') + ' MB';
+  if (bytes >= 1024) return Math.round(bytes / 1024) + ' KB';
+  return bytes + ' B';
+}
+function renderAnexos(input) {
+  const container = input.closest('div').querySelector('.anexos');
+  container.innerHTML = '';
+  [...input.files].forEach((file, i) => {
+    const item = document.createElement('div');
+    item.className = 'anexo';
+    const isImagem = /^image\//.test(file.type);
+    const midia = isImagem
+      ? '<img src="' + URL.createObjectURL(file) + '" alt="" onerror="this.outerHTML=\'<svg width=44 height=44 viewBox=0 0 24 24 fill=#9aa0a6><path d=\'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z\'/></svg>\'">'
+      : '<span class="apk-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 18H7v-1h10v1zm0-3H7V6h10v10zM7 5V4h10v1H7z"/></svg></span>';
+    item.innerHTML = midia +
+      '<span class="info"><b>' + file.name.replace(/</g, '&lt;') + '</b><small>' + tamanhoLegivel(file.size) + '</small></span>' +
+      '<button type="button" class="remover-anexo" title="Remover">✕</button>';
+    item.querySelector('.remover-anexo').addEventListener('click', () => {
+      // remover o arquivo do input (DataTransfer permite exclusão individual)
+      const dt = new DataTransfer();
+      [...input.files].forEach((f, j) => { if (j !== i) dt.items.add(f); });
+      input.files = dt.files;
+      renderAnexos(input);
+    });
+    container.appendChild(item);
+  });
+}
+['icone', 'screenshots', 'apk'].forEach(nome => {
+  const input = document.querySelector('input[name="' + nome + '"]');
+  input.addEventListener('change', () => renderAnexos(input));
+});
+
+// roda do mouse incrementa/decrementa campos numéricos (downloads, "útil")
+document.addEventListener('wheel', (e) => {
+  const alvo = e.target;
+  if (alvo.tagName !== 'INPUT' || alvo.type !== 'number' || !alvo.matches(':focus')) return;
+  e.preventDefault();
+  const passo = Number(alvo.step) || 1;
+  alvo.value = Math.max(Number(alvo.min) || 0, (Number(alvo.value) || 0) + (e.deltaY < 0 ? passo : -passo));
+  alvo.dispatchEvent(new Event('input', { bubbles: true }));
+}, { passive: false });
+
+const FORM_CHAVES = ['titulo','empresa','dev_id','nota','num_avaliacoes','classificacao','downloads','atualizado_em','disponivel_em','descricao_curta','descricao'];
+
+// persistência dos interruptores (plug and play)
+const switches = [...document.querySelectorAll('.sw input')];
+switches.forEach(sw => {
+  const chave = 'pg_' + sw.name;
+  if (localStorage.getItem(chave) !== null) {
+    sw.checked = localStorage.getItem(chave) === '1';
+    aplicar(sw);
+  }
+  sw.addEventListener('change', () => {
+    localStorage.setItem(chave, sw.checked ? '1' : '0');
+    aplicar(sw);
+  });
+});
+function aplicar(sw) {
+  const mapa = {
+    exibir_nota: 'card-nota', exibir_classificacao: 'card-detalhes',
+    exibir_downloads: 'card-detalhes', exibir_atualizado: 'card-detalhes',
+    exibir_disponivel: 'card-detalhes', exibir_descricao: 'card-descricao',
+    exibir_screenshots: 'card-screenshots', exibir_comentarios: 'card-comentarios'
+  };
+  const alvo = mapa[sw.name];
+  if (!alvo) return;
+  // para switches dentro de um card coletivo, ocultar apenas a linha do campo
+  const linha = sw.closest('div[style*="align-items"]');
+  if (alvo === 'card-detalhes' && linha) {
+    linha.style.opacity = sw.checked ? '' : '.4';
+    linha.querySelectorAll('input').forEach(i => { if (i !== sw) i.disabled = !sw.checked; });
+    return;
+  }
+  const card = document.getElementById(alvo);
+  card.classList.toggle('off', !sw.checked);
+  // campos ocultos não podem travar o envio (required)
+  card.querySelectorAll('input:not([type=checkbox]), textarea, select').forEach(i => i.disabled = !sw.checked);
+}
+switches.forEach(aplicar);
+
+async function subirArquivo(file, nomeAlternativo) {
+  const r = await fetch('/api/upload-url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome: nomeAlternativo || file.name, tipo: file.type })
+  });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.erro || 'Falha ao preparar envio');
+  const up = await fetch(j.uploadUrl, {
+    method: 'PUT',
+    headers: { 'x-upsert': 'false' },
+    body: file
+  });
+  if (!up.ok) throw new Error('Falha ao enviar ' + file.name);
+  return j.publicUrl;
+}
+
+document.getElementById('btnAddComentario').addEventListener('click', () => {
+  const div = document.createElement('div');
+  div.className = 'comentario';
+  div.innerHTML = `
+    <div class="cab"><span>Comentário</span><button type="button" class="remover-c">Remover</button></div>
+    <div class="linha2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label>Nome do autor</label><input type="text" name="c_nome" placeholder="Ex: Miss Fortune"></div>
+      <div><label>Estrelas</label><select name="c_estrelas">
+        <option value="5">5 estrelas</option><option value="4">4 estrelas</option>
+        <option value="3">3 estrelas</option><option value="2">2 estrelas</option>
+        <option value="1">1 estrela</option>
+      </select></div>
+    </div>
+    <div class="linha2" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><label>Data (calendário)</label><input type="date" name="c_data"></div>
+      <div><label>"Útil" por N pessoas</label><input type="number" name="c_util" min="0" value="8"></div>
+    </div>
+    <div><label>URL da foto do perfil</label><input type="url" name="c_foto" placeholder="https://..."></div>
+    <div><label>Comentário</label><textarea name="c_texto" style="min-height:70px"></textarea></div>
+  `;
+  div.querySelector('.remover-c').addEventListener('click', () => div.remove());
+  document.getElementById('listaComentarios').appendChild(div);
+});
+
+document.getElementById('formGerar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('btnEnviar');
+  const erro = document.getElementById('msgErro');
+  const res = document.getElementById('resultado');
+  const link = document.getElementById('linkGerado');
+  erro.style.display = 'none';
+  res.style.display = 'none';
+  btn.disabled = true;
+
+  try {
+    const dados = new FormData(form);
+    const iconeInput = form.querySelector('input[name="icone"]');
+    const scInput = form.querySelector('input[name="screenshots"]');
+
+    btn.textContent = 'Enviando ícone...';
+    const icone_url = await subirArquivo(iconeInput.files[0]);
+
+    const screenshots = [];
+    const total = scInput.files.length;
+    for (let i = 0; i < total; i++) {
+      btn.textContent = 'Enviando captura ' + (i + 1) + '/' + total + '...';
+      screenshots.push(await subirArquivo(scInput.files[i]));
+    }
+
+    let apk_url = '';
+    const apkInput = form.querySelector('input[name="apk"]');
+    if (apkInput.files[0]) {
+      btn.textContent = 'Enviando APK...';
+      const tituloSeguro = (dados.get('titulo') || 'app').trim() || 'app';
+      apk_url = await subirArquivo(apkInput.files[0], tituloSeguro + '.apk');
+    }
+
+    btn.textContent = 'Gerando página...';
+    const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    const dataExtenso = (iso) => {
+      if (!iso) return '';
+      const [a, m, d] = iso.split('-').map(Number);
+      return d + ' de ' + MESES[m - 1] + ' de ' + a;
+    };
+    const comentarios = [...document.querySelectorAll('#listaComentarios .comentario')].map(div => ({
+      nome: div.querySelector('[name="c_nome"]').value,
+      estrelas: div.querySelector('[name="c_estrelas"]').value,
+      data: dataExtenso(div.querySelector('[name="c_data"]').value),
+      util: div.querySelector('[name="c_util"]').value,
+      foto: div.querySelector('[name="c_foto"]').value,
+      texto: div.querySelector('[name="c_texto"]').value
+    }));
+    const payload = {
+      titulo: dados.get('titulo'),
+      empresa: dados.get('empresa'),
+      dev_id: dados.get('dev_id'),
+      nota: dados.get('nota'),
+      num_avaliacoes: dados.get('num_avaliacoes'),
+      classificacao: dados.get('classificacao'),
+      downloads: dados.get('downloads_num') + ' ' + dados.get('downloads_uni') + '+',
+      nota: String(dados.get('nota')).replace('.', ','),
+      num_avaliacoes: dados.get('num_avaliacoes_num') + ' ' + dados.get('num_avaliacoes_uni') + ' avaliações',
+      atualizado_em: dados.get('atualizado_em'),
+      disponivel_em: dados.get('disponivel_em'),
+      descricao_curta: dados.get('descricao_curta') || '',
+      descricao: dados.get('descricao'),
+      icone_url,
+      screenshots,
+      apk_url,
+      comentarios,
+      exibir: {
+        nota: form.querySelector('[name="exibir_nota"]').checked,
+        num_avaliacoes: form.querySelector('[name="exibir_nota"]').checked,
+        classificacao: form.querySelector('[name="exibir_classificacao"]').checked,
+        downloads: form.querySelector('[name="exibir_downloads"]').checked,
+        atualizado: form.querySelector('[name="exibir_atualizado"]').checked,
+        disponivel: form.querySelector('[name="exibir_disponivel"]').checked,
+        descricao: form.querySelector('[name="exibir_descricao"]').checked,
+        screenshots: form.querySelector('[name="exibir_screenshots"]').checked,
+        comentarios: form.querySelector('[name="exibir_comentarios"]').checked
+      }
+    };
+    const r = await fetch('/api/gerar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Erro ao gerar');
+
+    res.style.display = 'block';
+    link.href = j.url;
+    link.textContent = location.origin + j.url;
+  } catch (err) {
+    erro.textContent = err.message;
+    erro.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Gerar página';
+  }
+});
+// sessão: quem está logado, sair e lista dos apps
+  (async () => {
+    const r = await fetch('/api/auth/eu');
+    if (r.status === 401) { location.href = '/'; return; }
+    const j = await r.json();
+    if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
+    document.getElementById('quem').textContent = j.usuario.nome + ' · ' + j.usuario.email +
+      (j.usuario.admin ? ' · admin' : '');
+    document.getElementById('btnSair').addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      location.href = '/';
+    });
+    carregarMeusApps();
+  })();
+  async function carregarMeusApps() {
+    const r = await fetch('/api/meus-apps');
+    if (r.status === 401) { location.href = '/'; return; }
+    const j = await r.json();
+    const caixa = document.getElementById('listaMeusApps');
+    const aviso = document.getElementById('avisoVencimento');
+    const vencendo = j.apps.filter(a => !a.expirado && a.dias_restantes !== null && a.dias_restantes <= 3);
+    if (vencendo.length) {
+      aviso.style.display = 'block';
+      aviso.innerHTML = '⏳ ' + vencendo.length + ' app(s) vencem em até 3 dias: ' +
+        vencendo.map(a => '<b>' + (a.titulo || a.token).replace(/</g, '&lt;') + '</b> (' + a.dias_restantes + ' dia' + (a.dias_restantes === 1 ? '' : 's') + ')').join(', ') +
+        '. Gere novamente para renovar o prazo.';
+    } else aviso.style.display = 'none';
+    if (j.limite_apps) {
+      document.getElementById('contadorApps').textContent = j.apps_usados + ' de ' + j.limite_apps + ' no plano ' + j.plano;
+    } else {
+      document.getElementById('contadorApps').textContent = j.apps_usados + ' no plano ' + j.plano + ' (ilimitado)';
+    }
+    if (!j.ok || !j.apps.length) { caixa.innerHTML = '<span class="vazio">Você ainda não gerou nenhuma página.</span>'; return; }
+    caixa.innerHTML = '';
+    j.apps.forEach(app => {
+      const linha = document.createElement('div');
+      linha.className = 'app-linha';
+      const link = location.origin + '/<token>';
+      linha.innerHTML = '<b>' + (app.titulo || app.token).replace(/</g, '&lt;') + '</b>' +
+        '<span class="prazo' + (app.expirado ? ' expirado' : '') + '">' +
+        (app.expirado ? 'expirado' : 'expira em ' + app.dias_restantes + ' dia' + (app.dias_restantes === 1 ? '' : 's')) + '</span>' +
+        '<button class="btn-mini" data-abrir>abrir</button>' +
+        '<button class="btn-mini" data-copiar>copiar link</button>';
+      linha.querySelector('[data-abrir]').addEventListener('click', () => window.open('/' + app.token, '_blank'));
+      linha.querySelector('[data-copiar]').addEventListener('click', async (e) => {
+        try {
+          await navigator.clipboard.writeText(location.origin + '/' + app.token);
+          e.target.textContent = 'copiado!';
+          setTimeout(() => { e.target.textContent = 'copiar link'; }, 1500);
+        } catch (err) {
+          prompt('Copie o link:', location.origin + '/' + app.token);
+        }
+      });
+      caixa.appendChild(linha);
+    });
+  }
+</script>
+</body>
+</html>

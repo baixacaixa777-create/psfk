@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Administração · Play Generator</title>
+<style>
+:root{--verde:#01875f;--verde-escuro:#016b4a;--txt:#202124;--cinza:#5f6368;--borda:#e8eaed;--bg:#f8f9fa;--vermelho:#c5221f}
+*{box-sizing:border-box}
+body{margin:0;font-family:Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt)}
+.topo{background:#fff;border-bottom:1px solid var(--borda);position:sticky;top:0;z-index:10}
+.topo-in{max-width:900px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:12px 20px}
+.logo{width:22px;height:22px}
+.topo b{font-size:16px}
+.topo .sessao{margin-left:auto;font-size:12.5px;color:var(--cinza);display:flex;gap:10px;align-items:center}
+.btn-mini{background:#fff;border:1px solid var(--borda);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+.btn-mini:hover{background:#f1f3f4}
+nav.abas{max-width:900px;margin:0 auto;display:flex;gap:6px;padding:10px 20px 0}
+nav.abas button{border:none;background:none;padding:10px 14px;font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--cinza);border-bottom:2px solid transparent}
+nav.abas button.ativa{color:var(--verde);border-bottom-color:var(--verde)}
+main{max-width:900px;margin:0 auto;padding:16px 20px 60px}
+.card{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:16px;margin-bottom:14px}
+h2.titulo{font-size:15px;font-weight:500;margin:0 0 12px}
+.barra{background:#e8eaed;border-radius:999px;height:14px;overflow:hidden}
+.barra>div{height:100%;background:var(--verde);transition:width .4s}
+.barra.alerta>div{background:#e37400}
+.barra.critica>div{background:var(--vermelho)}
+.numeros{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+.numero{border:1px solid var(--borda);border-radius:10px;padding:10px 12px}
+.numero b{font-size:18px;display:block}
+.numero small{color:var(--cinza);font-size:11.5px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{color:var(--cinza);text-align:left;font-weight:500;padding:8px 6px;border-bottom:1px solid var(--borda)}
+td{padding:8px 6px;border-bottom:1px solid #f1f3f4;vertical-align:middle}
+tr.expirado td{color:var(--vermelho)}
+input.mini,select.mini{width:80px;padding:6px 8px;border:1px solid var(--borda);border-radius:6px;font-size:12.5px;font-family:inherit}
+input.longo{width:180px}
+button.acao{background:none;border:1px solid var(--borda);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;color:var(--txt)}
+button.acao.perigo{color:var(--vermelho)}
+button.acao:hover{background:#f1f3f4}
+.pill{display:inline-block;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:500}
+.pill.ativa{background:#e6f4ee;color:var(--verde-escuro)}
+.pill.pendente{background:#fef7e0;color:#b06000}
+.pill.cancelada{background:#fce8e6;color:var(--vermelho)}
+.totem{font-family:monospace;font-size:20px;letter-spacing:6px;text-align:center;padding:8px;background:#f1f3f4;border-radius:8px;margin:6px 0}
+.barra-tempo{background:#e8eaed;border-radius:999px;height:6px;overflow:hidden}
+.barra-tempo>div{height:100%;background:var(--verde)}
+.2fa-caixa{border:1px solid var(--borda);border-radius:10px;padding:10px;margin-top:8px}
+.vazio{color:var(--cinza);font-size:13px}
+.erro{color:var(--vermelho);font-size:13px}
+</style>
+</head>
+<body>
+<header class="topo"><div class="topo-in">
+  <svg class="logo" viewBox="0 0 24 24"><path fill="#4285f4" d="M4.1 2.66c-.27.29-.42.73-.42 1.3v16.08c0 .57.15 1.01.42 1.3l.07.07L14.02 11.5v-.23L4.17 2.6l-.07.06z"/><path fill="#34a853" d="M17.32 14.82l-3.3-3.3v-.23l3.3-3.3.07.04 3.91 2.22c1.12.63 1.12 1.67 0 2.31l-3.91 2.22-.07.04z"/><path fill="#fbbc04" d="M17.39 14.78L14.02 11.4 4.1 21.34c.37.39.98.44 1.67.05l11.62-6.61"/><path fill="#ea4335" d="M17.39 8.02L5.77 1.41c-.69-.39-1.3-.34-1.67.05l9.92 9.94 3.37-3.38z"/></svg>
+  <b>Administração</b>
+  <span class="sessao"><span id="quem"></span><button class="btn-mini" id="btnSair">Sair</button></span>
+</div></header>
+
+<nav class="abas">
+  <button class="ativa" data-aba="resumo">Visão geral</button>
+  <button data-aba="apps">Apps</button>
+  <button data-aba="usuarios">Usuários</button>
+</nav>
+
+<main>
+  <div class="card" id="painelResumo"><h2 class="titulo">Armazenamento do Supabase</h2>
+    <div class="barra" id="barraStorage"><div style="width:0%"></div></div>
+    <p style="font-size:12.5px;color:var(--cinza);margin:8px 0 0" id="legendaStorage"></p>
+    <div class="numeros">
+      <div class="numero"><b id="nUsuarios">—</b><small>usuários</small></div>
+      <div class="numero"><b id="nApps">—</b><small>apps criados</small></div>
+      <div class="numero"><b id="nPages">—</b><small>páginas (storage)</small></div>
+      <div class="numero"><b id="nMidia">—</b><small>ícones/APKs (storage)</small></div>
+    </div>
+  </div>
+  <div class="card" id="caixaAcessos" style="display:none"></div>
+  <div class="card" id="painelApps" style="display:none"><h2 class="titulo">Apps criados</h2>
+    <table><thead><tr><th>App</th><th>Dono</th><th>Criado</th><th>Prazo</th><th>Novo prazo (dias)</th><th></th></tr></thead>
+    <tbody id="tabelaApps"></tbody></table>
+  </div>
+  <div class="card" id="painelUsuarios" style="display:none"><h2 class="titulo">Usuários e assinaturas</h2>
+    <table><thead><tr><th>Usuário</th><th>Plano</th><th>Assinatura</th><th>Vence em</th><th>2FA</th><th></th></tr></thead>
+    <tbody id="tabelaUsuarios"></tbody></table>
+    <div class="2fa-caixa" id="caixa2fa" style="display:none">
+      <b id="titulo2fa"></b>
+      <div class="totem" id="totem2fa"></div>
+      <div class="barra-tempo"><div id="barra2fa" style="width:100%"></div></div>
+      <p style="font-size:11.5px;color:var(--cinza);margin:6px 0 0">Código atual do cliente (temporizado). Compartilhe por um canal confiável apenas quando ele perder o acesso.</p>
+      <button class="acao perigo" id="btnReset2fa" style="margin-top:8px">Resetar 2FA deste cliente</button>
+      <span id="erro2fa" class="erro"></span>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let id2faVivo = null;
+let timer2fa = null;
+
+(async () => {
+  const r = await fetch('/api/auth/eu');
+  if (!r.ok) { location.href = '/'; return; }
+  const j = await r.json();
+  if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
+  if (!j.usuario.admin) { location.href = '/dashboard.html'; return; }
+  $('#quem').textContent = j.usuario.email;
+  carregarResumo();
+})();
+
+$('#btnSair').addEventListener('click', async () => { await fetch('/api/auth/logout', { method: 'POST' }); location.href = '/'; });
+
+document.querySelectorAll('nav.abas button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav.abas button').forEach(x => x.classList.toggle('ativa', x === b));
+  $('#painelResumo').style.display = b.dataset.aba === 'resumo' ? 'block' : 'none';
+  $('#painelApps').style.display = b.dataset.aba === 'apps' ? 'block' : 'none';
+  $('#painelUsuarios').style.display = b.dataset.aba === 'usuarios' ? 'block' : 'none';
+  if (b.dataset.aba === 'resumo') carregarResumo();
+  if (b.dataset.aba === 'apps') carregarApps();
+  if (b.dataset.aba === 'usuarios') carregarUsuarios();
+}));
+
+function dataCurta(iso) { return iso ? new Date(iso).toLocaleDateString('pt-BR') : '—'; }
+
+async function carregarResumo() {
+  const r = await fetch('/api/admin/overview');
+  if (r.status === 401) { location.href = '/'; return; }
+  const j = await r.json();
+  if (!j.ok) return;
+  const p = j.storage.percentual;
+  const barra = $('#barraStorage');
+  barra.querySelector('div').style.width = Math.min(100, p) + '%';
+  barra.className = 'barra' + (p >= 90 ? ' critica' : p >= 70 ? ' alerta' : '');
+  $('#legendaStorage').textContent = (j.storage.usado_bytes / 1048576).toFixed(1) + ' MB de ' +
+    (j.storage.limite_bytes / 1048576).toFixed(0) + ' MB usados (' + p + '%)';
+  $('#nUsuarios').textContent = j.total_usuarios ?? '—';
+  $('#nApps').textContent = j.total_apps ?? '—';
+  $('#nPages').textContent = (j.storage.pages_bytes / 1048576).toFixed(1) + ' MB';
+  $('#nMidia').textContent = (j.storage.midia_bytes / 1048576).toFixed(1) + ' MB';
+}
+
+async function carregarApps() {
+  const j = await (await fetch('/api/admin/apps')).json();
+  if (!j.ok) return;
+  const t = $('#tabelaApps');
+  if (!j.apps.length) { t.innerHTML = '<tr><td colspan="6" class="vazio">Nenhum app criado.</td></tr>'; return; }
+  t.innerHTML = '';
+  j.apps.forEach(app => {
+    const tr = document.createElement('tr');
+    if (app.expirado) tr.className = 'expirado';
+    tr.innerHTML =
+      '<td><b>' + (app.titulo || '').replace(/</g, '&lt;') + '</b><br><small style="color:var(--cinza)">' + app.token.slice(0, 16) + '…</small></td>' +
+      '<td>' + (app.dono || '—') + '</td>' +
+      '<td>' + dataCurta(app.criado_em) + '</td>' +
+      '<td>' + (app.expirado ? 'expirado' : app.dias_restantes + ' dia(s)') + '</td>' +
+      '<td><input class="mini" type="number" min="1" value="' + (app.dias_restantes > 0 ? app.dias_restantes : 30) + '"></td>' +
+      '<td><button class="acao" data-salvar>salvar</button> <button class="acao perigo" data-apagar>apagar</button> ' +
+      '<button class="acao" data-ver>ver</button> <button class="acao" data-acessos>acessos</button></td>';
+    const dias = tr.querySelector('input');
+    tr.querySelector('[data-salvar]').addEventListener('click', async () => {
+      const r = await fetch('/api/admin/apps?token=' + app.token, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dias: Number(dias.value) })
+      });
+      if ((await r.json()).ok) carregarApps();
+    });
+    tr.querySelector('[data-apagar]').addEventListener('click', async () => {
+      if (!confirm('Apagar "' + (app.titulo || app.token) + '" definitivamente?')) return;
+      const r = await fetch('/api/admin/apps?token=' + app.token, { method: 'DELETE' });
+      if ((await r.json()).ok) carregarApps();
+    });
+    tr.querySelector('[data-ver]').addEventListener('click', () => window.open('/' + app.token, '_blank'));
+    tr.querySelector('[data-acessos]').addEventListener('click', async () => {
+      const r = await fetch('/api/admin/acessos?token=' + app.token);
+      const j = await r.json();
+      const caixa = document.getElementById('caixaAcessos');
+      if (!j.ok) { caixa.innerHTML = '<b>Acessos</b><br><span class="erro">' + (j.erro || 'Erro') + '</span>'; }
+      else if (!j.total) { caixa.innerHTML = '<b>' + (app.titulo || 'App') + '</b><br><span class="vazio">Nenhum acesso registrado.</span>'; }
+      else {
+        caixa.innerHTML = '<b>' + (app.titulo || 'App') + '</b> — ' + j.total_7d + ' acesso(s) nos últimos 7 dias, ' + j.total + ' no total:' +
+          '<div style="max-height:180px;overflow:auto;font-size:12px;color:var(--cinza)">' +
+          j.ultimos.map(a => '<div>' + new Date(a.criado_em).toLocaleString('pt-BR') + ' · ' + (a.user_agent || '—').slice(0, 60) + '</div>').join('') + '</div>';
+      }
+      caixa.style.display = 'block';
+      caixa.scrollIntoView({ block: 'nearest' });
+    });
+    t.appendChild(tr);
+  });
+}
+
+async function carregarUsuarios() {
+  const j = await (await fetch('/api/admin/usuarios')).json();
+  if (!j.ok) return;
+  const t = $('#tabelaUsuarios');
+  t.innerHTML = '';
+  j.usuarios.forEach(u => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td><b>' + (u.nome || '—').replace(/</g, '&lt;') + '</b><br><small style="color:var(--cinza)">' + u.email + '</small></td>' +
+      '<td><select class="mini" data-plano>' +
+        ['quinzenal', 'mensal', 'trimestral'].map(p => '<option' + (u.plano === p ? ' selected' : '') + '>' + p + '</option>').join('') +
+      '</select></td>' +
+      '<td><span class="pill ' + u.assinatura_status + '">' + u.assinatura_status + '</span>' +
+        '<select class="mini" data-status style="margin-left:6px;width:auto">' +
+        ['pendente', 'ativa', 'cancelada'].map(s => '<option' + (u.assinatura_status === s ? ' selected' : '') + '>' + s + '</option>').join('') +
+      '</select><br><input class="mini" data-vencer type="number" min="1" placeholder="renovar (dias)" style="margin-top:6px;width:120px"></td>' +
+      '<td>' + dataCurta(u.assinatura_vence_em) + '</td>' +
+      '<td>' + (u.twofa_ativo ? '<span class="pill ativa">ativo</span>' : '<span class="pill pendente">não configurado</span>') +
+        '<br><button class="acao" data-2fa>ver ao vivo</button></td>' +
+      '<td><button class="acao" data-renovar title="Marca como pago e estende 1 ciclo do plano atual">renovar +1 ciclo</button> <button class="acao" data-salvar>salvar</button>' + (u.admin ? '' : ' <button class="acao perigo" data-excluir>excluir</button>') + '</td>';
+    tr.querySelector('[data-salvar]').addEventListener('click', async () => {
+      const corpo = { plano: tr.querySelector('[data-plano]').value, assinatura_status: tr.querySelector('[data-status]').value };
+      const vd = tr.querySelector('[data-vencer]').value;
+      if (vd) corpo.vencer_dias = Number(vd);
+      const r = await fetch('/api/admin/usuarios?id=' + u.id, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo)
+      });
+      if ((await r.json()).ok) carregarUsuarios();
+    });
+    tr.querySelector('[data-renovar]').addEventListener('click', async () => {
+      if (!confirm('Renovar assinatura de ' + u.email + ' por 1 ciclo (' + u.plano + ')?')) return;
+      const ciclos = { quinzenal: 15, mensal: 30, trimestral: 90 };
+      const r = await fetch('/api/admin/usuarios?id=' + u.id, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plano: u.plano, assinatura_status: 'ativa', vencer_dias: ciclos[u.plano] || 30 })
+      });
+      if ((await r.json()).ok) carregarUsuarios();
+    });
+    tr.querySelector('[data-excluir]').addEventListener('click', async () => {
+      if (!confirm('Excluir ' + u.email + ' e todos os dados vinculados?')) return;
+      const r = await fetch('/api/admin/usuarios?id=' + u.id, { method: 'DELETE' });
+      if ((await r.json()).ok) carregarUsuarios();
+    });
+    tr.querySelector('[data-2fa]').addEventListener('click', () => abrir2faVivo(u));
+    t.appendChild(tr);
+  });
+}
+
+function abrir2faVivo(u) {
+  id2faVivo = u.id;
+  $('#caixa2fa').style.display = 'block';
+  $('#titulo2fa').textContent = '2FA ao vivo · ' + u.email;
+  atualizar();
+  clearInterval(timer2fa);
+  timer2fa = setInterval(atualizar, 1000);
+}
+
+async function atualizar() {
+  if (!id2faVivo) return;
+  const j = await (await fetch('/api/admin/2fa?id=' + id2faVivo)).json();
+  if (!j.ok) { $('#totem2fa').textContent = j.erro || '—'; return; }
+  $('#totem2fa').textContent = j.codigo;
+  $('#barra2fa').style.width = (j.segundos_restantes / 30 * 100) + '%';
+}
+
+$('#btnReset2fa').addEventListener('click', async () => {
+  if (!confirm('Resetar o 2FA? O cliente precisará reconfigurar no próximo login.')) return;
+  const r = await fetch('/api/admin/2fa?id=' + id2faVivo, { method: 'POST' });
+  const j = await r.json();
+  if (j.ok) { clearInterval(timer2fa); id2faVivo = null; $('#caixa2fa').style.display = 'none'; carregarUsuarios(); }
+  else $('#erro2fa').textContent = j.erro || '';
+});
+</script>
+</body>
+</html>

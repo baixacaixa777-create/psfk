@@ -5,3 +5,6 @@ campanhas.json
 public/uploads/
 _build_template.py
 _diag_*.py
+
+.vercel
+.env*

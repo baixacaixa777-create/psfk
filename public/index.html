@@ -3,175 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gerador de páginas Play Store Clone</title>
+<title>Entrar · Play Generator</title>
 <style>
-*{-webkit-tap-highlight-color:transparent}body{margin:0;font-family:Roboto,Helvetica,Arial,sans-serif;background:#f5f5f5;color:#202124}.maxw{max-width:720px;margin:0 auto;padding:24px}h1{font-size:20px;margin:0 0 8px}form{background:#fff;padding:20px;border-radius:8px;border:1px solid #dadce0;box-shadow:0 1px 2px rgba(0,0,0,0.1)}.grupo{margin-bottom:16px}label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:#3c4043}input,textarea{width:100%;padding:10px;border:1px solid #dadce0;border-radius:4px;font-size:14px;box-sizing:border-box}input:focus,textarea:focus{outline:none;border-color:#1a73e8}textarea{min-height:120px;resize:vertical}.linha{display:flex;gap:12px;flex-wrap:wrap}.linha>div{flex:1}fieldset{border:none;padding:0;margin:0}legend{font-size:13px;font-weight:500;margin-bottom:10px;color:#3c4043}button.btn{background:#1a73e8;color:#fff;border:none;padding:12px 20px;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer}button.btn:hover{background:#1557b0}button.btn:disabled{opacity:0.6;cursor:not-allowed}#resultado{margin-top:20px;padding:16px;background:#e8f0fe;border:1px solid #b4d2ff;border-radius:4px;display:none}#resultado a{color:#1a73e8;font-weight:500;word-break:break-all}.erro{color:#d9302b;font-size:13px;margin-top:8px;display:none}small{color:#666;font-size:12px}
+:root{--verde:#01875f;--verde-escuro:#016b4a;--txt:#202124;--cinza:#5f6368;--borda:#e8eaed;--bg:#f8f9fa;--vermelho:#c5221f}
+*{-webkit-tap-highlight-color:transparent;box-sizing:border-box}
+body{margin:0;font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column}
+.topo{background:#fff;border-bottom:1px solid var(--borda)}
+.topo-in{max-width:420px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:12px 20px}
+.logo{width:24px;height:24px}
+.topo b{font-size:17px}
+main{max-width:420px;width:100%;margin:0 auto;padding:24px 20px;flex:1}
+.card{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:22px 20px;box-shadow:0 1px 2px rgba(60,64,67,.08)}
+.abas{display:flex;gap:6px;margin-bottom:18px;background:#f1f3f4;border-radius:999px;padding:4px}
+.aba{flex:1;border:none;background:none;padding:9px 0;border-radius:999px;font-size:13.5px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--cinza)}
+.aba.ativa{background:#fff;color:var(--verde);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+label{display:block;font-size:12.5px;font-weight:500;color:var(--cinza);margin:14px 0 6px}
+input,select{width:100%;padding:11px 12px;border:1px solid var(--borda);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border .15s,box-shadow .15s;background:#fff;color:var(--txt)}
+input:focus,select:focus{border-color:var(--verde);box-shadow:0 0 0 3px rgba(1,135,95,.12)}
+button.principal{width:100%;margin-top:20px;background:var(--verde);color:#fff;border:none;padding:13px;border-radius:999px;font-size:14.5px;font-weight:500;font-family:inherit;cursor:pointer}
+button.principal:hover{background:var(--verde-escuro)}
+button.principal:disabled{opacity:.55;cursor:default}
+.erro{color:var(--vermelho);font-size:13px;margin-top:12px;display:none}
+.painel2fa{display:none}
+.painel2fa h2{font-size:16px;margin:0 0 8px}
+.painel2fa p{font-size:13px;color:var(--cinza);line-height:1.55;margin:0 0 12px}
+.chave{background:#f1f3f4;border-radius:8px;padding:10px 12px;font-family:monospace;font-size:13px;word-break:break-all;user-select:all;margin-bottom:12px}
+.uri{display:none}
+.dica{font-size:12px;color:var(--cinza);margin-top:14px;line-height:1.5}
+.codigo{font-size:22px;letter-spacing:8px;text-align:center;font-family:monospace;padding:12px;border:1px solid var(--borda);border-radius:8px}
+.rodape{text-align:center;font-size:12px;color:var(--cinza);padding:18px}
+a{color:var(--verde)}
 </style>
 </head>
 <body>
-<div class="maxw">
-  <h1>Gerador de páginas (mostruário whitelabel)</h1>
-  <p style="color:#5f6368;font-size:14px">Preencha os dados, anexe ícone e capturas, e gere uma página com link exclusivo.</p>
+<header class="topo"><div class="topo-in">
+  <svg class="logo" viewBox="0 0 24 24"><path fill="#4285f4" d="M4.1 2.66c-.27.29-.42.73-.42 1.3v16.08c0 .57.15 1.01.42 1.3l.07.07L14.02 11.5v-.23L4.17 2.6l-.07.06z"/><path fill="#34a853" d="M17.32 14.82l-3.3-3.3v-.23l3.3-3.3.07.04 3.91 2.22c1.12.63 1.12 1.67 0 2.31l-3.91 2.22-.07.04z"/><path fill="#fbbc04" d="M17.39 14.78L14.02 11.4 4.1 21.34c.37.39.98.44 1.67.05l11.62-6.61"/><path fill="#ea4335" d="M17.39 8.02L5.77 1.41c-.69-.39-1.3-.34-1.67.05l9.92 9.94 3.37-3.38z"/></svg>
+  <b>Play Generator</b>
+</div></header>
 
-  <form id="formGerar">
-    <div class="grupo">
-      <label>Título do app</label>
-      <input type="text" name="titulo" placeholder="Ex: Subway Surfers City" required>
-    </div>
-    <div class="grupo">
-      <label>Nome da empresa / desenvolvedora</label>
-      <input type="text" name="empresa" placeholder="Ex: SYBO Games" required>
-    </div>
-    <div class="grupo">
-      <label>ID da desenvolvedora (dev id)</label>
-      <input type="text" name="dev_id" placeholder="Ex: 7363891306616760846" required>
-    </div>
-    <div class="linha">
-      <div class="grupo" style="flex:1">
-        <label>Avaliação (ex: 4,6)</label>
-        <input type="text" name="nota" placeholder="4,6" required>
-      </div>
-      <div class="grupo" style="flex:1">
-        <label>Número de avaliações</label>
-        <input type="text" name="num_avaliacoes" placeholder="338 mil avaliações" required>
-      </div>
-    </div>
-    <div class="linha">
-      <div class="grupo" style="flex:1">
-        <label>Classificação indicativa</label>
-        <input type="text" name="classificacao" placeholder="Classificação 18 anos" required>
-      </div>
-      <div class="grupo" style="flex:1">
-        <label>Downloads</label>
-        <input type="text" name="downloads" placeholder="10 mi+" required>
-      </div>
-    </div>
-    <div class="grupo">
-      <label>Atualizado em</label>
-      <input type="text" name="atualizado_em" placeholder="2 de nov. de 2026" required>
-    </div>
-    <div class="grupo">
-      <label>Disponível em</label>
-      <input type="text" name="disponivel_em" placeholder="Android, Windows" required>
-    </div>
-    <div class="grupo">
-      <label>Descrição curta (meta / resumo)</label>
-      <input type="text" name="descricao_curta" placeholder="Corra, salte, desvie e explore seu jogo!">
-    </div>
-    <div class="grupo">
-      <label>Descrição (Sobre este jogo)</label>
-      <textarea name="descricao" required>Corra, salte, desvie e explore seu jogo! Principais recursos...</textarea>
+<main>
+  <div class="card" id="cardAuth">
+    <div class="abas">
+      <button class="aba ativa" data-aba="entrar">Entrar</button>
+      <button class="aba" data-aba="criar">Inscrever-se</button>
     </div>
 
-    <fieldset>
-      <legend>Ícone do app (PNG, mesmo tamanho do original)</legend>
-      <div class="grupo" style="margin-bottom:8px">
-        <input type="file" name="icone" accept="image/*" required>
-      </div>
-    </fieldset>
+    <form id="formEntrar" style="display:none">
+      <label>E-mail</label><input type="email" name="email" autocomplete="username" required>
+      <label>Senha</label><input type="password" name="senha" autocomplete="current-password" required>
+      <button class="principal" type="submit">Entrar</button>
+      <div class="erro" id="erroEntrar"></div>
+    </form>
 
-    <fieldset>
-      <legend>Capturas de tela (até 20 imagens)</legend>
-      <div class="grupo" style="margin-bottom:8px">
-        <input type="file" name="screenshots" accept="image/*" multiple>
-        <small>Selecione várias imagens</small>
-      </div>
-    </fieldset>
+    <form id="formCriar">
+      <label>Seu nome</label><input type="text" name="nome" autocomplete="name" required>
+      <label>E-mail</label><input type="email" name="email" autocomplete="username" required>
+      <label>Senha (mínimo 8 caracteres)</label><input type="password" name="senha" autocomplete="new-password" minlength="8" required>
+      <label>Plano</label>
+      <select name="plano">
+        <option value="quinzenal">Quinzenal</option>
+        <option value="mensal" selected>Mensal</option>
+        <option value="trimestral">Trimestral</option>
+      </select>
+      <button class="principal" type="submit">Criar conta</button>
+      <div class="erro" id="erroCriar"></div>
+      <p class="dica">A assinatura começa como <b>pendente</b>: o pagamento é confirmado manualmente pelo administrador.</p>
+    </form>
 
-    <button type="submit" class="btn" id="btnEnviar">Gerar página</button>
-    <div class="erro" id="msgErro"></div>
-  </form>
-
-  <div id="resultado">
-    <strong>Página gerada com sucesso!</strong><br>
-    <a id="linkGerado" href="#" target="_blank"></a>
+    <div class="painel2fa" id="painel2fa">
+      <h2>Ativar verificação em duas etapas</h2>
+      <p id="p2fa">Para proteger sua conta, escaneie ou digite a chave abaixo no app <b>Google Authenticator</b> (ou similar) e confirme o código de 6 dígitos.</p>
+      <div id="qr2fa" style="text-align:center;margin-bottom:12px"></div>
+      <div class="chave" id="chaveSecret"></div>
+      <label>Código do app (6 dígitos)</label>
+      <input class="codigo" type="text" name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+      <button class="principal" type="button" id="btnConfirmar2fa">Confirmar e entrar</button>
+      <div class="erro" id="erro2fa"></div>
+      <p class="dica">Guarde essa chave: ela é a única forma de gerar seus códigos.</p>
+    </div>
   </div>
-
-  <div style="margin-top:24px;font-size:13px;color:#5f6368">
-    <strong>Links úteis:</strong><br>
-    • <a href="/api/campanhas" target="_blank">Listar campanhas geradas (JSON)</a><br>
-    • As páginas ficam disponíveis em <code>/&lt;token&gt;</code>
-  </div>
-</div>
+</main>
+<div class="rodape">Play Generator · páginas whitelabel</div>
 
 <script>
-async function subirArquivo(file) {
-  const r = await fetch('/api/upload-url', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nome: file.name, tipo: file.type })
-  });
-  const j = await r.json();
-  if (!j.ok) throw new Error(j.erro || 'Falha ao preparar envio');
-  const up = await fetch(j.uploadUrl, {
-    method: 'PUT',
-    headers: { 'x-upsert': 'false' },
-    body: file
-  });
-  if (!up.ok) throw new Error('Falha ao enviar ' + file.name);
-  return j.publicUrl;
+const $ = (s) => document.querySelector(s);
+const mostrarErro = (id, msg) => { const e = $(id); e.textContent = msg; e.style.display = 'block'; };
+let secretAtual = null;
+
+// já logado? vai direto ao painel
+(async () => {
+  const r = await fetch('/api/auth/eu');
+  if (r.ok) {
+    const j = await r.json();
+    if (!j.pendente_2fa) { location.href = '/dashboard.html'; return; }
+  }
+  if (location.search.includes('2fa=1')) { abrir2fa(); }
+})();
+
+function alternar(aba) {
+  document.querySelectorAll('.aba').forEach(a => a.classList.toggle('ativa', a.dataset.aba === aba));
+  $('#formEntrar').style.display = aba === 'entrar' ? 'block' : 'none';
+  $('#formCriar').style.display = aba === 'criar' ? 'block' : 'none';
+}
+document.querySelectorAll('.aba').forEach(a => a.addEventListener('click', () => alternar(a.dataset.aba)));
+alternar('entrar');
+
+function abrir2fa() {
+  $('#cardAuth').style.display = 'none';
+  const p = $('#painel2fa');
+  p.style.display = 'block';
+  p.parentElement.style.display = 'block';
 }
 
-document.getElementById('formGerar').addEventListener('submit', async (e) => {
+function mostrar2fa(dados) {
+  secretAtual = dados.secret;
+  $('#chaveSecret').textContent = dados.secret;
+  abrir2fa();
+  desenharQr(dados.uri);
+}
+// QR via CDN; sem internet no carregamento, fica a chave manual (sempre visível)
+function desenharQr(uri) {
+  const caixa = $('#qr2fa');
+  caixa.innerHTML = '';
+  const carregar = new Promise((ok, falha) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
+    s.onload = ok; s.onerror = falha;
+    document.head.appendChild(s);
+    setTimeout(falha, 6000);
+  });
+  carregar.then(() => {
+    const canvas = document.createElement('canvas');
+    caixa.appendChild(canvas);
+    window.QRCode.toCanvas(canvas, uri, { width: 180, margin: 1 }, (err) => {
+      if (err) caixa.innerHTML = '<span class="vazio" style="color:var(--cinza);font-size:12px">Use a chave manual abaixo</span>';
+    });
+  }).catch(() => {
+    caixa.innerHTML = '<span style="color:var(--cinza);font-size:12px">Não foi possível gerar o QR — use a chave manual abaixo</span>';
+  });
+}
+
+$('#formEntrar').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const form = e.target;
-  const btn = document.getElementById('btnEnviar');
-  const erro = document.getElementById('msgErro');
-  const res = document.getElementById('resultado');
-  const link = document.getElementById('linkGerado');
-  erro.style.display = 'none';
-  res.style.display = 'none';
-  btn.disabled = true;
-
+  const dados = new FormData(e.target);
   try {
-    const dados = new FormData(form);
-    const iconeInput = form.querySelector('input[name="icone"]');
-    const scInput = form.querySelector('input[name="screenshots"]');
-
-    btn.textContent = 'Enviando ícone...';
-    const icone_url = await subirArquivo(iconeInput.files[0]);
-
-    const screenshots = [];
-    const total = scInput.files.length;
-    for (let i = 0; i < total; i++) {
-      btn.textContent = 'Enviando captura ' + (i + 1) + '/' + total + '...';
-      screenshots.push(await subirArquivo(scInput.files[i]));
-    }
-
-    btn.textContent = 'Gerando página...';
-    const payload = {
-      titulo: dados.get('titulo'),
-      empresa: dados.get('empresa'),
-      dev_id: dados.get('dev_id'),
-      nota: dados.get('nota'),
-      num_avaliacoes: dados.get('num_avaliacoes'),
-      classificacao: dados.get('classificacao'),
-      downloads: dados.get('downloads'),
-      atualizado_em: dados.get('atualizado_em'),
-      disponivel_em: dados.get('disponivel_em'),
-      descricao_curta: dados.get('descricao_curta') || '',
-      descricao: dados.get('descricao'),
-      icone_url,
-      screenshots
-    };
-    const r = await fetch('/api/gerar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+    const r = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: dados.get('email'), senha: dados.get('senha') })
     });
     const j = await r.json();
-    if (!j.ok) throw new Error(j.erro || 'Erro ao gerar');
+    if (!j.ok) throw new Error(j.erro || 'Erro ao entrar');
+    if (j.twofa) mostrar2fa(j.twofa); else abrir2fa();
+  } catch (err) { mostrarErro('#erroEntrar', err.message); }
+});
 
-    res.style.display = 'block';
-    link.href = j.url;
-    link.textContent = location.origin + j.url;
-  } catch (err) {
-    erro.textContent = err.message;
-    erro.style.display = 'block';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Gerar página';
-  }
+$('#formCriar').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dados = new FormData(e.target);
+  try {
+    const r = await fetch('/api/auth/registrar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: dados.get('nome'), email: dados.get('email'), senha: dados.get('senha'), plano: dados.get('plano') })
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Erro ao criar conta');
+    mostrar2fa(j.twofa);
+  } catch (err) { mostrarErro('#erroCriar', err.message); }
+});
+
+$('#btnConfirmar2fa').addEventListener('click', async () => {
+  const codigo = $('input[name="codigo"]').value.trim();
+  try {
+    const r = await fetch('/api/auth/2fa/verificar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigo })
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.erro || 'Código incorreto');
+    location.href = j.usuario && j.usuario.admin ? '/admin.html' : '/dashboard.html';
+  } catch (err) { mostrarErro('#erro2fa', err.message); }
 });
 </script>
 </body>
