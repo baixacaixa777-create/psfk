@@ -14,10 +14,13 @@ body{margin:0;font-family:Roboto,'Helvetica Neue',Arial,sans-serif;background:va
 .topo b{font-size:17px}
 main{max-width:460px;width:100%;margin:0 auto;padding:40px 20px;flex:1}
 .card{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:32px 24px;box-shadow:0 1px 2px rgba(60,64,67,.08)}
-.cadeado{font-size:64px;text-align:center;margin-bottom:16px;opacity:.9}
+.lock{width:120px;height:120px;margin:0 auto 24px}
+.lock .arco{fill:none;stroke:#c4c7c5;stroke-width:10;stroke-linecap:round}
+.lock .corpo{fill:#c4c7c5}
+.lock .arco.ativo,.lock .corpo.ativo{fill:var(--verde-escuro);stroke:var(--verde-escuro)}
 h2{font-size:20px;font-weight:600;margin:0 0 8px;text-align:center}
 p.sub{text-align:center;color:var(--cinza);font-size:14px;margin:0 0 24px;line-height:1.5}
-.dados{background:#fef7e0;border:1px solid #f0d264;border-radius:12px;padding:16px;margin-bottom:20px}
+.dados{background:#fef7e0;border:1px solid #f0d264;border-radius:12px;padding:16px;margin-bottom:24px}
 .dados b{display:block;font-size:13px;color:var(--amarelo-escuro);margin-bottom:6px}
 .dados span{font-size:13.5px;color:var(--txt)}
 .btn-whatsapp{width:100%;background:#25d366;color:#fff;border:none;padding:16px;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
@@ -36,16 +39,20 @@ p.sub{text-align:center;color:var(--cinza);font-size:14px;margin:0 0 24px;line-h
 
 <main>
   <div class="card">
-    <div class="cadeado">🔒</div>
+    <svg class="lock" viewBox="0 0 24 24">
+      <path class="arco" d="M12 13a5 5 0 0 0-5-5V5a2 2 0 0 1 4 0v3a5 5 0 0 0 5 5v3a2 2 0 0 1-4 0z"/>
+      <path class="corpo" d="M12 8a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-3a3 3 0 0 0-3-3z"/>
+      <path class="corpo" d="M12 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+    </svg>
     <h2>Assinatura pendente</h2>
     <p class="sub" id="msg">Sua assinatura ainda está sendo confirmada pelo administrador. Enquanto isso, o acesso à ferramenta fica bloqueado.</p>
     <div class="dados">
-      <b id="lblEmail">E-mail: <span id="dadosEmail">—</span></b>
+      <b>E-mail: <span id="dadosEmail">—</span></b>
       <span id="lblPlano">Plano: <span id="dadosPlano">—</span></span>
     </div>
     <button class="btn-whatsapp" id="btnZap">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.822 4.149c-.446-2.06-2.446-3.245-4.529-3.245h-5.58c-2.522 0-4.544 1.707-4.544 3.814v10.694c0 2.548 2.022 3.814 4.544 3.814h5.58c2.522 0 4.529-1.707 4.529-3.814V4.149zm-2.78 13.337c0 1.046-.985 1.739-2.034 1.739h-.577v-3.48h-.577v3.48h-.576v-5.238h.576v1.413h.577c.597 0 1.046-.418 1.046-1.046v-1.35c0-1.358-1.046-2.06-2.034-2.06h-.577V7.339h.577c1.046 0 2.034.702 2.034 2.034v4.311h-.577v3.48z"/></svg>
-      Quero garantir minha assinatura
+      <span id="txtZap">Quero garantir minha assinatura</span>
     </button>
     <a class="voltar" href="/">Voltar para o login</a>
   </div>
@@ -65,10 +72,8 @@ const planoMap = { quinzenal: 'Quinzenal', mensal: 'Mensal', trimestral: 'Trimes
   $('#dadosEmail').textContent = u.email;
   $('#dadosPlano').textContent = planoMap[u.plano] || u.plano;
 
-  const texto = encodeURIComponent(
-    'quero garantir minha assinatura do plano ' + (planoMap[u.plano] || u.plano) +
-    ' no meu numero +44 7348 503814'
-  );
+  const plano = planoMap[u.plano] || u.plano;
+  const texto = encodeURIComponent('Olá! Quero garantir minha assinatura do plano ' + plano);
   $('#btnZap').onclick = () => {
     location.href = 'https://wa.me/447348503814?text=' + texto;
   };
