@@ -189,8 +189,17 @@ async function carregarApps() {
 }
 
 async function carregarUsuarios() {
-  const j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios' }) })).json();
-  if (!j.ok) return;
+  let j;
+  try {
+    j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios' }) })).json();
+  } catch (e) {
+    $('#tabelaUsuarios').innerHTML = '<tr><td colspan="6" class="erro">Erro ao carregar usuários.</td></tr>';
+    return;
+  }
+  if (!j.ok || !Array.isArray(j.usuarios)) {
+    $('#tabelaUsuarios').innerHTML = '<tr><td colspan="6" class="erro">' + (j && j.erro ? j.erro : 'Resposta inválida') + '</td></tr>';
+    return;
+  }
   const t = $('#tabelaUsuarios');
   t.innerHTML = '';
   j.usuarios.forEach(u => {
