@@ -123,7 +123,7 @@ document.querySelectorAll('nav.abas button').forEach(b => b.addEventListener('cl
 function dataCurta(iso) { return iso ? new Date(iso).toLocaleDateString('pt-BR') : '—'; }
 
 async function carregarResumo() {
-  const r = await fetch('/api/admin/overview');
+  const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'overview' }) });
   if (r.status === 401) { location.href = '/'; return; }
   const j = await r.json();
   if (!j.ok) return;
@@ -140,7 +140,7 @@ async function carregarResumo() {
 }
 
 async function carregarApps() {
-  const j = await (await fetch('/api/admin/apps')).json();
+  const j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'apps' }) })).json();
   if (!j.ok) return;
   const t = $('#tabelaApps');
   if (!j.apps.length) { t.innerHTML = '<tr><td colspan="6" class="vazio">Nenhum app criado.</td></tr>'; return; }
@@ -158,20 +158,20 @@ async function carregarApps() {
       '<button class="acao" data-ver>ver</button> <button class="acao" data-acessos>acessos</button></td>';
     const dias = tr.querySelector('input');
     tr.querySelector('[data-salvar]').addEventListener('click', async () => {
-      const r = await fetch('/api/admin/apps?token=' + app.token, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dias: Number(dias.value) })
+      const r = await fetch('/api/admin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ acao: 'apps-editar', token: app.token, dias: Number(dias.value) })
       });
       if ((await r.json()).ok) carregarApps();
     });
     tr.querySelector('[data-apagar]').addEventListener('click', async () => {
       if (!confirm('Apagar "' + (app.titulo || app.token) + '" definitivamente?')) return;
-      const r = await fetch('/api/admin/apps?token=' + app.token, { method: 'DELETE' });
+      const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'apagar-app', token: app.token }) });
       if ((await r.json()).ok) carregarApps();
     });
     tr.querySelector('[data-ver]').addEventListener('click', () => window.open('/' + app.token, '_blank'));
     tr.querySelector('[data-acessos]').addEventListener('click', async () => {
-      const r = await fetch('/api/admin/acessos?token=' + app.token);
+      const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'acessos', token: app.token }) });
       const j = await r.json();
       const caixa = document.getElementById('caixaAcessos');
       if (!j.ok) { caixa.innerHTML = '<b>Acessos</b><br><span class="erro">' + (j.erro || 'Erro') + '</span>'; }
@@ -189,7 +189,7 @@ async function carregarApps() {
 }
 
 async function carregarUsuarios() {
-  const j = await (await fetch('/api/admin/usuarios')).json();
+  const j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios' }) })).json();
   if (!j.ok) return;
   const t = $('#tabelaUsuarios');
   t.innerHTML = '';
@@ -212,8 +212,8 @@ async function carregarUsuarios() {
       const corpo = { plano: tr.querySelector('[data-plano]').value, assinatura_status: tr.querySelector('[data-status]').value };
       const vd = tr.querySelector('[data-vencer]').value;
       if (vd) corpo.vencer_dias = Number(vd);
-      const r = await fetch('/api/admin/usuarios?id=' + u.id, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo)
+      const r = await fetch('/api/admin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios-editar', id: u.id, ...corpo })
       });
       if ((await r.json()).ok) carregarUsuarios();
     });
@@ -228,7 +228,7 @@ async function carregarUsuarios() {
     });
     tr.querySelector('[data-excluir]').addEventListener('click', async () => {
       if (!confirm('Excluir ' + u.email + ' e todos os dados vinculados?')) return;
-      const r = await fetch('/api/admin/usuarios?id=' + u.id, { method: 'DELETE' });
+      const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'excluir-usuario', id: u.id }) });
       if ((await r.json()).ok) carregarUsuarios();
     });
     tr.querySelector('[data-2fa]').addEventListener('click', () => abrir2faVivo(u));
@@ -247,7 +247,7 @@ function abrir2faVivo(u) {
 
 async function atualizar() {
   if (!id2faVivo) return;
-  const j = await (await fetch('/api/admin/2fa?id=' + id2faVivo)).json();
+  const j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: '2fa', id: id2faVivo }) })).json();
   if (!j.ok) { $('#totem2fa').textContent = j.erro || '—'; return; }
   $('#totem2fa').textContent = j.codigo;
   $('#barra2fa').style.width = (j.segundos_restantes / 30 * 100) + '%';
@@ -255,7 +255,7 @@ async function atualizar() {
 
 $('#btnReset2fa').addEventListener('click', async () => {
   if (!confirm('Resetar o 2FA? O cliente precisará reconfigurar no próximo login.')) return;
-  const r = await fetch('/api/admin/2fa?id=' + id2faVivo, { method: 'POST' });
+  const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'resetar-2fa', id: id2faVivo }) });
   const j = await r.json();
   if (j.ok) { clearInterval(timer2fa); id2faVivo = null; $('#caixa2fa').style.display = 'none'; carregarUsuarios(); }
   else $('#erro2fa').textContent = j.erro || '';

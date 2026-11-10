@@ -92,7 +92,7 @@ let secretAtual = null;
 
 // já logado? vai direto ao painel
 (async () => {
-  const r = await fetch('/api/auth/eu');
+  const r = await fetch('/api/auth');
   if (r.ok) {
     const j = await r.json();
     if (!j.pendente_2fa) { location.href = '/dashboard.html'; return; }
@@ -147,9 +147,9 @@ $('#formEntrar').addEventListener('submit', async (e) => {
   e.preventDefault();
   const dados = new FormData(e.target);
   try {
-    const r = await fetch('/api/auth/login', {
+    const r = await fetch('/api/auth', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: dados.get('email'), senha: dados.get('senha') })
+      body: JSON.stringify({ acao: 'login', email: dados.get('email'), senha: dados.get('senha') })
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.erro || 'Erro ao entrar');
@@ -161,9 +161,9 @@ $('#formCriar').addEventListener('submit', async (e) => {
   e.preventDefault();
   const dados = new FormData(e.target);
   try {
-    const r = await fetch('/api/auth/registrar', {
+    const r = await fetch('/api/auth', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: dados.get('nome'), email: dados.get('email'), senha: dados.get('senha'), plano: dados.get('plano') })
+      body: JSON.stringify({ acao: 'registrar', nome: dados.get('nome'), email: dados.get('email'), senha: dados.get('senha'), plano: dados.get('plano') })
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.erro || 'Erro ao criar conta');
@@ -174,9 +174,9 @@ $('#formCriar').addEventListener('submit', async (e) => {
 $('#btnConfirmar2fa').addEventListener('click', async () => {
   const codigo = $('input[name="codigo"]').value.trim();
   try {
-    const r = await fetch('/api/auth/2fa/verificar', {
+    const r = await fetch('/api/auth', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ codigo })
+      body: JSON.stringify({ acao: 'verificar', codigo })
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.erro || 'Código incorreto');

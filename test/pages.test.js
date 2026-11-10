@@ -119,17 +119,19 @@ before(async () => {
   base = 'http://127.0.0.1:' + server.address().port;
   // sessão de administrador para os testes (fluxo completo: registro + 2FA)
   process.env.ADMIN_EMAILS = 'admin@teste.local';
-  const registro = await realFetch(base + '/api/auth/registrar', {
+  const registro = await realFetch(base + '/api/auth', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'admin@teste.local', nome: 'Admin', senha: 'senha-admin-1' })
+    body: JSON.stringify({ acao: 'registrar', email: 'admin@teste.local', nome: 'Admin', senha: 'senha-admin-1' })
   });
   const registroJson = await registro.json();
   assert.equal(registroJson.ok, true, 'registro do admin');
   const cookiePendente = (registro.headers.get('set-cookie') || '').match(/sessao=([a-f0-9]+)/)[1];
-  const verificacao = await realFetch(base + '/api/auth/2fa/verificar', {
+  console.error('DEBUG before: base=', base, '| cookiePendente=', cookiePendente);
+  const verificacao = await realFetch(base + '/api/auth', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: 'sessao=' + cookiePendente },
-    body: JSON.stringify({ codigo: auth.codigoTotp(registroJson.twofa.secret) })
+    body: JSON.stringify({ acao: 'verificar', codigo: auth.codigoTotp(registroJson.twofa.secret) })
   });
+  console.error('DEBUG verificar:', verificacao.status, verificacao.headers.get('content-type'), '|', (await verificacao.clone().text()).slice(0, 120));
   const verificacaoJson = await verificacao.json();
   assert.equal(verificacaoJson.ok, true, 'verificação do 2FA');
   cookieAdmin = 'sessao=' + ((verificacao.headers.get('set-cookie') || '').match(/sessao=([a-f0-9]+)/)[1]);
