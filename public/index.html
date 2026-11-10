@@ -71,15 +71,17 @@ a{color:var(--verde)}
     </form>
 
     <div class="painel2fa" id="painel2fa">
-      <h2>Ativar verificação em duas etapas</h2>
-      <p id="p2fa">Para proteger sua conta, escaneie ou digite a chave abaixo no app <b>Google Authenticator</b> (ou similar) e confirme o código de 6 dígitos.</p>
-      <div id="qr2fa" style="text-align:center;margin-bottom:12px"></div>
-      <div class="chave" id="chaveSecret"></div>
+      <h2 id="titulo2fa">Verificação em duas etapas</h2>
+      <p id="desc2fa">Digite o código de 6 dígitos gerado no seu app autenticador.</p>
+      <div id="blocoChave" style="display:none">
+        <div id="qr2fa" style="text-align:center;margin-bottom:12px"></div>
+        <div class="chave" id="chaveSecret"></div>
+        <p class="dica">Guarde essa chave: ela é a única forma de gerar seus códigos.</p>
+      </div>
       <label>Código do app (6 dígitos)</label>
       <input class="codigo" type="text" name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
       <button class="principal" type="button" id="btnConfirmar2fa">Confirmar e entrar</button>
       <div class="erro" id="erro2fa"></div>
-      <p class="dica">Guarde essa chave: ela é a única forma de gerar seus códigos.</p>
     </div>
   </div>
 </main>
@@ -97,7 +99,7 @@ let secretAtual = null;
     const j = await r.json();
     if (!j.pendente_2fa) { location.href = '/dashboard.html'; return; }
   }
-  if (location.search.includes('2fa=1')) { abrir2fa(); }
+  if (location.search.includes('2fa=1')) { abrirAtivacao(); }
 })();
 
 function alternar(aba) {
@@ -108,17 +110,32 @@ function alternar(aba) {
 document.querySelectorAll('.aba').forEach(a => a.addEventListener('click', () => alternar(a.dataset.aba)));
 alternar('entrar');
 
-function abrir2fa() {
+function abrirCodigo() {
+  // login de conta que JÁ tem o 2FA: apenas pede o código do app
+  $('#titulo2fa').textContent = 'Verificação em duas etapas';
+  $('#desc2fa').textContent = 'Digite o código de 6 dígitos gerado no seu app autenticador.';
+  $('#blocoChave').style.display = 'none';
   $('#cardAuth').style.display = 'none';
-  const p = $('#painel2fa');
-  p.style.display = 'block';
-  p.parentElement.style.display = 'block';
+  $('#painel2fa').parentElement.style.display = 'block';
+  $('#painel2fa').style.display = 'block';
+  $('input[name="codigo"]').focus();
+}
+
+function abrirAtivacao() {
+  // cadastro novo ou retomada: mostra a chave/QR para cadastrar no app
+  $('#titulo2fa').textContent = 'Ativar verificação em duas etapas';
+  $('#desc2fa').innerHTML = 'Para proteger sua conta, escaneie ou digite a chave abaixo no app <b>Google Authenticator</b> (ou similar) e confirme o código de 6 dígitos.';
+  $('#blocoChave').style.display = 'block';
+  $('#cardAuth').style.display = 'none';
+  $('#painel2fa').parentElement.style.display = 'block';
+  $('#painel2fa').style.display = 'block';
+  $('input[name="codigo"]').focus();
 }
 
 function mostrar2fa(dados) {
   secretAtual = dados.secret;
   $('#chaveSecret').textContent = dados.secret;
-  abrir2fa();
+  abrirAtivacao();
   desenharQr(dados.uri);
 }
 // QR via CDN; sem internet no carregamento, fica a chave manual (sempre visível)
@@ -146,7 +163,7 @@ $('#formEntrar').addEventListener('submit', async (e) => {
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.erro || 'Erro ao entrar');
-    if (j.twofa) mostrar2fa(j.twofa); else abrir2fa();
+    if (j.twofa) mostrar2fa(j.twofa); else abrirCodigo();
   } catch (err) { mostrarErro('#erroEntrar', err.message); }
 });
 

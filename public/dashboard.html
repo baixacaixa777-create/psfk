@@ -506,6 +506,14 @@ document.getElementById('formGerar').addEventListener('submit', async (e) => {
     if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
     document.getElementById('quem').textContent = j.usuario.nome + ' · ' + j.usuario.email +
       (j.usuario.admin ? ' · admin' : '');
+    if (j.usuario.admin) {
+      const atalho = document.createElement('a');
+      atalho.href = '/admin.html';
+      atalho.className = 'btn-mini';
+      atalho.textContent = 'Painel admin';
+      atalho.style.textDecoration = 'none';
+      document.querySelector('.barra-sessao').prepend(atalho);
+    }
     document.getElementById('btnSair').addEventListener('click', async () => {
       await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'logout' }) });
       location.href = '/';
