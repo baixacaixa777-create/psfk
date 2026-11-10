@@ -484,7 +484,13 @@ document.getElementById('formGerar').addEventListener('submit', async (e) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const j = await r.json();
+    let j;
+    try {
+      j = await r.json();
+    } catch (e) {
+      const texto = await r.text().catch(() => '');
+      throw new Error('Servidor respondeu não-JSON (HTTP ' + r.status + '): ' + (texto || '').slice(0, 200));
+    }
     if (!j.ok) throw new Error(j.erro || 'Erro ao gerar');
 
     res.style.display = 'block';
