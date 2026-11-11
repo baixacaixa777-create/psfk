@@ -231,7 +231,11 @@ async function carregarUsuarios() {
       '<td>' + (u.twofa_ativo ? '<span class="pill ativa">ativo</span>' : '<span class="pill pendente">não configurado</span>') +
         '<br><button class="acao" data-2fa>ver ao vivo</button></td>' +
       '<td><button class="acao" data-renovar title="Marca como pago e estende 1 ciclo do plano atual">renovar +1 ciclo</button> <button class="acao" data-salvar>salvar</button>' + (u.admin ? '' : ' <button class="acao perigo" data-excluir>excluir</button>') + '</td>';
-    tr.querySelector('[data-salvar]').addEventListener('click', async () => {
+    const btnSalvar = tr.querySelector('[data-salvar]');
+    const btnRenovar = tr.querySelector('[data-renovar]');
+    const btnExcluir = tr.querySelector('[data-excluir]');
+    const btn2fa = tr.querySelector('[data-2fa]');
+    if (btnSalvar) btnSalvar.addEventListener('click', async () => {
       const corpo = { plano: tr.querySelector('[data-plano]').value, assinatura_status: tr.querySelector('[data-status]').value };
       const vd = tr.querySelector('[data-vencer]').value;
       if (vd) corpo.vencer_dias = Number(vd);
@@ -240,7 +244,7 @@ async function carregarUsuarios() {
       });
       if ((await r.json()).ok) carregarUsuarios();
     });
-    tr.querySelector('[data-renovar]').addEventListener('click', async () => {
+    if (btnRenovar) btnRenovar.addEventListener('click', async () => {
       if (!confirm('Renovar assinatura de ' + u.email + ' por 1 ciclo (' + u.plano + ')?')) return;
       const ciclos = { quinzenal: 15, mensal: 30, trimestral: 90 };
       const r = await fetch('/api/admin/usuarios?id=' + u.id, {
@@ -249,12 +253,12 @@ async function carregarUsuarios() {
       });
       if ((await r.json()).ok) carregarUsuarios();
     });
-    tr.querySelector('[data-excluir]').addEventListener('click', async () => {
+    if (btnExcluir) btnExcluir.addEventListener('click', async () => {
       if (!confirm('Excluir ' + u.email + ' e todos os dados vinculados?')) return;
       const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'excluir-usuario', id: u.id }) });
       if ((await r.json()).ok) carregarUsuarios();
     });
-    tr.querySelector('[data-2fa]').addEventListener('click', () => abrir2faVivo(u));
+    if (btn2fa) btn2fa.addEventListener('click', () => abrir2faVivo(u));
     t.appendChild(tr);
   });
 }
