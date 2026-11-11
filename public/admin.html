@@ -99,9 +99,12 @@ let id2faVivo = null;
 let timer2fa = null;
 
 (async () => {
+  console.log('[admin] iniciando carregamento');
   const r = await fetch('/api/auth');
+  console.log('[admin] /api/auth status', r.status);
   if (!r.ok) { location.href = '/'; return; }
   const j = await r.json();
+  console.log('[admin] usuario', j.usuario);
   if (j.pendente_2fa) { location.href = '/?2fa=1'; return; }
   if (!j.usuario.admin) { location.href = '/dashboard.html'; return; }
   $('#quem').textContent = j.usuario.email;
@@ -111,6 +114,7 @@ let timer2fa = null;
 $('#btnSair').addEventListener('click', async () => { await fetch('/api/auth/logout', { method: 'POST' }); location.href = '/'; });
 
 document.querySelectorAll('nav.abas button').forEach(b => b.addEventListener('click', () => {
+  console.log('[admin] clique aba', b.dataset.aba);
   document.querySelectorAll('nav.abas button').forEach(x => x.classList.toggle('ativa', x === b));
   $('#painelResumo').style.display = b.dataset.aba === 'resumo' ? 'block' : 'none';
   $('#painelApps').style.display = b.dataset.aba === 'apps' ? 'block' : 'none';
@@ -189,13 +193,18 @@ async function carregarApps() {
 }
 
 async function carregarUsuarios() {
+  console.log('[admin] carregarUsuarios iniciado');
   let j;
   try {
-    j = await (await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios' }) })).json();
+    const resp = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ acao: 'usuarios' }) });
+    console.log('[admin] /api/admin usuarios status', resp.status);
+    j = await resp.json();
   } catch (e) {
+    console.error('[admin] erro ao carregar usuarios', e);
     $('#tabelaUsuarios').innerHTML = '<tr><td colspan="6" class="erro">Erro ao carregar usuários.</td></tr>';
     return;
   }
+  console.log('[admin] resposta usuarios', j);
   if (!j.ok || !Array.isArray(j.usuarios)) {
     $('#tabelaUsuarios').innerHTML = '<tr><td colspan="6" class="erro">' + (j && j.erro ? j.erro : 'Resposta inválida') + '</td></tr>';
     return;
@@ -206,6 +215,7 @@ async function carregarUsuarios() {
     t.innerHTML = '<tr><td colspan="6" class="vazio">Nenhum usuário cadastrado.</td></tr>';
     return;
   }
+  console.log('[admin] renderizando', j.usuarios.length, 'usuários');
   j.usuarios.forEach(u => {
     const tr = document.createElement('tr');
     tr.innerHTML =
